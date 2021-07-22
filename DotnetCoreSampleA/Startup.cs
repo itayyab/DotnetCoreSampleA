@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NLog.Fluent;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
 
 namespace DotnetCoreSampleA
 {
@@ -32,9 +35,33 @@ namespace DotnetCoreSampleA
 
             services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            //X509Certificate2 cert = null;
+            //using (X509Store certStore = new X509Store(StoreName.My, StoreLocation.CurrentUser))
+            //{
+            //    certStore.Open(OpenFlags.ReadOnly);
+            //    X509Certificate2Collection certCollection = certStore.Certificates.Find(
+            //        X509FindType.FindByThumbprint,
+            //        // Replace below with your cert's thumbprint
+            //        "8f9cfcf9f6d9370723670efdb8e0da68b6e0c6d6",
+            //        false);
+            //    // Get the first cert with the thumbprint
+            //    if (certCollection.Count > 0)
+            //    {
+            //        cert = certCollection[0];
+            //        Log.Info($"Successfully loaded cert from registry: {cert.Thumbprint}");
+            //        //Log.Logger.Information($);
+            //    }
+            //}
 
+            //// Fallback to local file for development
+            //if (cert == null)
+            //{
+            //    cert = new X509Certificate2(Path.Combine("C:\\Users\\Tayyab\\dotnetcore\\dotnetsamplea.pfx"), "123");
+            //    Log.Info($"Falling back to cert from file. Successfully loaded: {cert.Thumbprint}");
+            //    //Log.Logger.Information($"Falling back to cert from file. Successfully loaded: {cert.Thumbprint}");
+            //}
             services.AddIdentityServer()
-                .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
+                .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();//.AddSigningCredential(cert);
 
             services.AddAuthentication()
                 .AddIdentityServerJwt();
