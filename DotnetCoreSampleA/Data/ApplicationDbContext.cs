@@ -5,9 +5,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using DotnetCoreSample;
+using DotnetCoreSampleA;
+using System.Data.Entity.Core.Metadata.Edm;
+using System.Globalization;
+using Microsoft.CodeAnalysis;
 
 namespace DotnetCoreSampleA.Data
 {
@@ -18,6 +21,8 @@ namespace DotnetCoreSampleA.Data
             IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
         {
         }
+
         public DbSet<DotnetCoreSample.User> User { get; set; }
+        public DbSet<DotnetCoreSampleA.Categories> Categories { get; set; }
     }
 }

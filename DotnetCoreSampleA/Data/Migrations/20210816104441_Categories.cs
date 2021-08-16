@@ -3,30 +3,30 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace DotnetCoreSampleA.Data.Migrations
 {
+
     [ExcludeFromCodeCoverage]
-    public partial class Users : Migration
+    public partial class Categories : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "User",
+                name: "Categories",
                 columns: table => new
                 {
-                    id = table.Column<long>(nullable: false)
+                    Cat_id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    email = table.Column<string>(nullable: true),
-                    name = table.Column<string>(nullable: true)
+                    Cat_name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User", x => x.id);
+                    table.PrimaryKey("PK_Categories", x => x.Cat_id);
                 });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "User");
+                name: "Categories");
         }
     }
 }

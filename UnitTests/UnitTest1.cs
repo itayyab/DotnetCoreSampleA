@@ -29,7 +29,7 @@ namespace UnitTests
 {
     public class UnitTest1
     {
-        private readonly TestServer _server;
+       /* private readonly TestServer _server;
         private readonly HttpClient _client;
 
         public UnitTest1()
@@ -55,7 +55,7 @@ namespace UnitTests
             _server = new TestServer(builder);
 
             _client = _server.CreateClient();
-        }
+        }*/
        /* public UnitTest1()
         {
             // Arrange
@@ -92,22 +92,22 @@ namespace UnitTests
             _client = _server.CreateClient();
         }
        */
-        [Fact]
-        public void PassingTest()
-        {
-            Assert.Equal(4, Add(2, 2));
-        }
+        //[Fact]
+        //public void PassingTest()
+        //{
+        //    Assert.Equal(4, Add(2, 2));
+        //}
 
-        [Fact]
-        public void FailingTest()
-        {
-            Assert.Equal(5, Add(2, 2));
-        }
+        //[Fact]
+        //public void FailingTest()
+        //{
+        //    Assert.Equal(5, Add(2, 2));
+        //}
 
-        int Add(int x, int y)
-        {
-            return x + y;
-        }
+        //int Add(int x, int y)
+        //{
+        //    return x + y;
+        //}
         //[Fact]
         //public async Task GetUser()
         //{
