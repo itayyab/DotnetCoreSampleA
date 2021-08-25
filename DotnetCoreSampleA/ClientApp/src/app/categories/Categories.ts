@@ -1,4 +1,7 @@
+import { Product } from "../products/Product";
+
 export interface Categories {
-  id: number;
-  name: string;
+  cat_id: number;
+  cat_name: string;
+ // products: Product[];
 }

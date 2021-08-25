@@ -16,7 +16,6 @@ export class CategoriesComponent implements OnInit {
   editHero: Categories; // the hero currently being edited
   title = '';
   name = '';
-  email = '';
   id = 0;
   message = '';
   edit = false;
@@ -24,10 +23,9 @@ export class CategoriesComponent implements OnInit {
   @ViewChild('exampleModal', { static: false }) exampleModal: ElementRef;
   @ViewChild('toast', { static: false }) toast: ElementRef;
   @ViewChild('namefiled', { static: false }) namefiled: ElementRef;
-  @ViewChild('emailfiled', { static: false }) emailfiled: ElementRef;
   @ViewChild('delbtn', { static: false }) delbtn: ElementRef;
   constructor(private heroesService: CategoriesService, @Inject('BASE_URL') baseUrl: string) {
-    console.log(baseUrl);
+    console.log("BaeURL:"+baseUrl);
   }
   ngOnInit() {
     this.getHeroes();
@@ -39,9 +37,8 @@ export class CategoriesComponent implements OnInit {
   }
   open2() {
     this.edit = false;
-    this.title = 'Add User';
+    this.title = 'Add Category';
     this.name = '';
-    this.email = '';
     this.id = 0;
 
     $(this.exampleModal.nativeElement).modal('show');
@@ -64,7 +61,7 @@ export class CategoriesComponent implements OnInit {
       .subscribe(hero => {
         this.heroes.push(hero);
         $(this.exampleModal.nativeElement).modal('hide');
-        this.message = 'User details added';
+        this.message = 'Category details added';
         $(this.toast.nativeElement).toast('show');
       });
 
@@ -72,10 +69,10 @@ export class CategoriesComponent implements OnInit {
 
   open(person: Categories) {
     this.edit = true;
-    this.title = 'Edit User';
-    this.name = person.name;
+    this.title = 'Edit Category';
+    this.name = person.cat_name;
     //this.email = person.email;
-    this.id = person.id;
+    this.id = person.cat_id;
 
     $(this.exampleModal.nativeElement).modal('show');
     // this.delbtn.nativeElement = true;
@@ -98,7 +95,7 @@ export class CategoriesComponent implements OnInit {
           //   console.log(hero);
           $(this.exampleModal.nativeElement).modal('hide');
           this.getHeroes();
-          this.message = 'User details updated';
+          this.message = 'Category details updated';
           $(this.toast.nativeElement).toast('show');
 
           //  this.sendMessageToParent('messageToSendC');
@@ -118,15 +115,15 @@ export class CategoriesComponent implements OnInit {
   closeModal() {
     $(this.exampleModal.nativeElement).modal('hide');
   }
-  addX(name: string, email: string): void {
+  addX(name: string): void {
     name = name.trim();
     if (!name) { return; }
-    this.heroesService.addHeroX({ name } as Categories)
+    this.heroesService.addHeroX({ cat_name: name } as Categories)
       .subscribe(hero => {
         //console.log(hero.email);
         this.heroes.push(hero);
         $(this.exampleModal.nativeElement).modal('hide');
-        this.message = 'User details added';
+        this.message = 'Category details added';
         $(this.toast.nativeElement).toast('show');
       });
   }
@@ -134,15 +131,15 @@ export class CategoriesComponent implements OnInit {
 
   delete(hero: Categories): void {
     console.log('size' + this.heroes.length);
-    this.heroes = this.heroes.filter(h => h.id !== hero.id);
+    this.heroes = this.heroes.filter(h => h.cat_id !== hero.cat_id);
     console.log('size' + this.heroes.length);
     // this.heroes.re
     this.heroesService
-      .deleteHero(hero.id)
+      .deleteHero(hero.cat_id)
       .subscribe();
     $(this.exampleModal.nativeElement).modal('hide');
     // this.getHeroes();
-    this.message = 'User details deleted';
+    this.message = 'Category deleted';
     $(this.toast.nativeElement).toast('show');
     /*
     // oops ... subscribe() is missing so nothing happens

@@ -3,6 +3,7 @@ using DotnetCoreSampleA.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
@@ -10,8 +11,11 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using NLog.Fluent;
+using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 
@@ -33,8 +37,9 @@ namespace DotnetCoreSampleA
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true).AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            
             //X509Certificate2 cert = null;
             //using (X509Store certStore = new X509Store(StoreName.My, StoreLocation.CurrentUser))
             //{
@@ -72,6 +77,22 @@ namespace DotnetCoreSampleA
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+            //services.AddSwaggerGen();
+            services.AddSwaggerGen(swagger =>
+            {
+                swagger.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "DotnetCoreSample API",
+                    Version = "v1.1",
+                    Description = "API to unerstand request and response schema.",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Home",
+                        Email = string.Empty,
+                        Url = new Uri("https://localhost:44316"),
+                    }
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -91,6 +112,11 @@ namespace DotnetCoreSampleA
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"StaticFiles")),
+                RequestPath = new PathString("/StaticFiles")
+            });
             if (!env.IsDevelopment())
             {
                 app.UseSpaStaticFiles();
@@ -101,6 +127,16 @@ namespace DotnetCoreSampleA
             app.UseAuthentication();
             app.UseIdentityServer();
             app.UseAuthorization();
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "DotnetCoreSample API V1.1");
+                c.RoutePrefix = "docs";
+            });
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -121,6 +157,7 @@ namespace DotnetCoreSampleA
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+           
         }
     }
 }

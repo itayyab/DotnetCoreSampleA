@@ -12,30 +12,27 @@
   </div>
   <div class="jumbotron jumbotron-fluid">
     <div class="container">
-      <h1 class="display-4">People</h1>
-      <p class="lead">This is a sample people list.</p>
+      <h1 class="display-4">Categories</h1>
     </div>
   </div>
 
   <div class="row">
     <div class="col-sm">
 
-      <button type="button" class="btn btn-outline-success float-right" (click)="open2()">Add User</button>
+      <button type="button" class="btn btn-outline-success float-right" (click)="open2()">Add Category</button>
     </div>
   </div>
   <table class="table table-hover">
     <thead class="thead-dark">
       <tr>
-        <th scope="col">ID</th>
-        <th scope="col">Name</th>
-        <th scope="col">Email</th>
+        <th scope="col">Category ID</th>
+        <th scope="col">Category Name</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let user of heroes">
-        <th scope="row">{{ user.id || -1 }}</th>
-        <td (click)="open(user)">{{user.name}}</td>
-        <td (click)="open(user)">{{user.email}}</td>
+        <th scope="row">{{ user.cat_id || -1 }}</th>
+        <td (click)="open(user)">{{user.cat_name}}</td>
       </tr>
     </tbody>
   </table>
@@ -54,24 +51,22 @@
           <form>
             <div class="form-group">
               <label for="recipient-name" class="col-form-label">Name:</label>
-              <input type="text" #namefiled class="form-control" id="recipient-name" value="{{name}}">
-              <label for="recipient-email" class="col-form-label">Email:</label>
-              <input type="text" #emailfiled class="form-control" id="recipient-email" value="{{email}}">
+              <input type="text" #namefiled class="form-control" id="recipient-name" value="{{name}}">           
             </div>
           </form>
         </div>
         <div class="modal-footer">
           <button (click)="closeModal()" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           <button #delbtn type="button" class="btn btn-danger float-right" *ngIf="edit"
-                  (click)="delete({id: id, name: name,email:emailfiled.value})">
+                  (click)="delete({cat_id: id, cat_name: namefiled.value})">
             Delete
           </button>
           <button type="button" class="btn btn-outline-dark" *ngIf="edit"
-                  (click)="update({id: id, name: namefiled.value,email:emailfiled.value})">
+                  (click)="update({cat_id: id, cat_name: namefiled.value})">
             Update
           </button>
           <button type="button" class="btn btn-outline-dark" *ngIf="!edit"
-                  (click)="addX(  namefiled.value,emailfiled.value)">
+                  (click)="addX(  namefiled.value)">
             Save
           </button>
 

@@ -49,6 +49,9 @@ export class AuthorizeService {
   }
 
   public getUser(): Observable<IUser | null> {
+    let user: User = null;
+    var ex = this.getUserFromStorage().pipe(filter(u => !!u), tap(u => this.userSubject.next(user && user.profile)));
+    //console.log("TayyabEx:" + JSON.stringify(ex));
     return concat(
       this.userSubject.pipe(take(1), filter(u => !!u)),
       this.getUserFromStorage().pipe(filter(u => !!u), tap(u => this.userSubject.next(u))),
@@ -59,6 +62,12 @@ export class AuthorizeService {
     return from(this.ensureUserManagerInitialized())
       .pipe(mergeMap(() => from(this.userManager.getUser())),
         map(user => user && user.access_token));
+  }
+
+  public getUserSub(): Observable<string> {
+    return from(this.ensureUserManagerInitialized())
+      .pipe(mergeMap(() => from(this.userManager.getUser())),
+        map(user => user && user.profile.sub));
   }
 
   // We try to authenticate the user in three different ways:
@@ -94,7 +103,7 @@ export class AuthorizeService {
         } else if (!this.popUpDisabled) {
           console.log('Popup authentication error: ', popupError);
         }
-
+        
         // PopUps might be blocked by the user, fallback to redirect
         try {
           await this.userManager.signinRedirect(this.createArguments(state));

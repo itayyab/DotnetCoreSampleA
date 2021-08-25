@@ -1,0 +1,119 @@
+<div class="container">
+  <div #toast class="toast" style="position: fixed; top: 50px; right: 20px;" data-delay="3000">
+    <div class="toast-header">
+      <strong class="mr-auto">Angular</strong>
+      <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="toast-body">
+      {{message}}
+    </div>
+  </div>
+  <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+      <h1 class="display-4">Products</h1>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm">
+
+      <button type="button" class="btn btn-outline-success float-right" (click)="open2()">Add Product</button>
+    </div>
+  </div>
+  <table class="table table-hover">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Name</th>
+        <th scope="col">Price</th>
+        <th scope="col">Description</th>
+        <th scope="col">Category</th>
+        <th scope="col">Picture</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of products">
+        <th scope="row">{{ user.pr_id || -1 }}</th>
+        <td (click)="open(user)">{{user.pr_name}}</td>
+        <td (click)="open(user)">{{user.pr_price}}</td>
+        <td (click)="open(user)">{{user.pr_desc}}</td>
+        <td (click)="open(user)">{{user.category.cat_name}}</td>
+        <td (click)="open(user)"><img [src]="createImgPath(user.pr_Picture)" alt="Product" width="250" height="250"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Modal -->
+  <div class="modal fade" #exampleModal tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">{{title}}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="loginForm" >
+            <div class="form-group">
+              <label for="recipient-name" class="col-form-label">Name:</label>
+              <input type="text" #namefiled formControlName="name" class="form-control" id="recipient-name" [(ngModel)]="name"
+                     [ngClass]="{ 'is-invalid': submitted && loginFormControl.name.errors }" />
+              <div *ngIf="submitted && loginFormControl.name.errors" class="invalid-feedback">
+                <div *ngIf="loginFormControl.name.errors.required">Name is required</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="recipient-name" class="col-form-label">Description:</label>
+              <input type="text" #descfiled formControlName="desc" class="form-control" id="recipient-name" [(ngModel)]="desc"
+                     [ngClass]="{ 'is-invalid': submitted && loginFormControl.desc.errors }" />
+              <div *ngIf="submitted && loginFormControl.desc.errors" class="invalid-feedback">
+                <div *ngIf="loginFormControl.desc.errors.required">Description is required</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="recipient-name" class="col-form-label">Price:</label>
+              <input type="number" #pricefiled formControlName="price" class="form-control" id="recipient-name" [(ngModel)]="price"
+                     [ngClass]="{ 'is-invalid': submitted && loginFormControl.price.errors }" />
+              <div *ngIf="submitted && loginFormControl.price.errors" class="invalid-feedback">
+                <div *ngIf="loginFormControl.price.errors.required">Price is required</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="exampleFormControlSelect1">Category:</label>
+              <select #selectfield class="form-control"  id="exampleFormControlSelect1" (change)="selectChange()">
+                <option *ngFor="let opt of categories" [value]="opt.cat_id" [selected]="opt.cat_id===cat">{{opt.cat_name}}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="pic" class="col-form-label">Image:</label>
+              <input #filefield id="pic" class="form-control-file" type="file"
+                     (change)="onChange($event)">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button (click)="closeModal()" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button #delbtn type="button" class="btn btn-danger float-right" *ngIf="edit"
+                  (click)="delete({pr_id: id,pr_name: namefiled.value,pr_desc: descfiled.value,Pr_Picture: '',pr_price:pricefiled.value,Category: {cat_id: selectfield.value}})">
+            Delete
+          </button>
+          <button type="button" class="btn btn-outline-dark" *ngIf="edit"
+                  (click)="update({pr_id: id,pr_name: namefiled.value,pr_desc: descfiled.value,Pr_Picture: '',pr_price:pricefiled.value,Category: {cat_id: selectfield.value}})">
+            Update
+          </button>
+          <button type="button" class="btn btn-outline-dark" *ngIf="!edit"
+                  (click)="addX({pr_id: id,pr_name: namefiled.value,pr_desc: descfiled.value,Pr_Picture: '',pr_price:pricefiled.value,Category: {cat_id: selectfield.value}})">
+            Save
+          </button>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

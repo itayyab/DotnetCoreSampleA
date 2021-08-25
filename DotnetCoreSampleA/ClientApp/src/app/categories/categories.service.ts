@@ -8,10 +8,11 @@ import { Categories } from './Categories';
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type': 'application/json',
+    'Accept':'text/plain',
     'Access-Control-Allow-Origin': 'https://localhost:44316',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Credentials': 'true',
-    'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token'
+    'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token,Accept'
   })
 };
 
@@ -23,7 +24,7 @@ const httpOptions = {
 })
 export class CategoriesService {
 
-  heroesUrl = 'https://localhost:44316/api/Categories';  // URL to web api
+  heroesUrl = 'https://localhost:44316/api/categories';  // URL to web api
   private handleError: HandleError;
 
 
@@ -62,7 +63,7 @@ export class CategoriesService {
   updateHero(hero: Categories): Observable<Categories> {
     // httpOptions.headers =
     //   httpOptions.headers.set('Authorization', 'my-new-auth-token');
-    const url = `${this.heroesUrl}/${hero.id}`; // PUT api/heroes/42
+    const url = `${this.heroesUrl}/${hero.cat_id}`; // PUT api/heroes/42
     return this.http.put<Categories>(url, hero, httpOptions)
       .pipe(
         catchError(this.handleError('updateHero', hero))
