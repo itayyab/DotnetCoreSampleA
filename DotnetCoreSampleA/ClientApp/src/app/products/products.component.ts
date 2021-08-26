@@ -135,7 +135,7 @@ export class ProductsComponent implements OnInit, AfterViewChecked {
  
   addX(pr: Product) {
 
-    //console.log(JSON.stringify(pr));
+    console.log(JSON.stringify(pr));
     this.submitted = true;
     if (this.loginForm.invalid) {
       console.log("invalid");
@@ -156,6 +156,7 @@ export class ProductsComponent implements OnInit, AfterViewChecked {
             .subscribe(hero => {
               //console.log(hero.email);
               //  console.log("DAta:" + JSON.stringify(hero));
+             // hero.category.cat_name = catname.cat_name;
               this.products.push(hero);
               $(this.exampleModal.nativeElement).modal('hide');
               this.message = 'Product details added';
@@ -226,7 +227,7 @@ export class ProductsComponent implements OnInit, AfterViewChecked {
     //  this.announce();
   }
   selectChange() {
-
+    console.log(this.selectfield.nativeElement.Value);
   }
   update(pr: Product) {
 

@@ -17,6 +17,7 @@ import { HttpErrorHandler } from './http-error-handler.service';
 import { MessageService } from './message.service';
 import { CategoriesComponent } from './categories/categories.component';
 import { ProductsComponent } from './products/products.component';
+import { CartComponent } from './cart/cart.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { ProductsComponent } from './products/products.component';
     FetchDataComponent,
     UsersComponent,
     CategoriesComponent,
-    ProductsComponent
+    ProductsComponent,
+    CartComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -42,6 +44,7 @@ import { ProductsComponent } from './products/products.component';
       { path: 'categories', component: CategoriesComponent },
       { path: 'products', component: ProductsComponent },
       { path: 'fetch-data', component: FetchDataComponent, canActivate: [AuthorizeGuard] },
+      { path: 'cart', component: CartComponent, canActivate: [AuthorizeGuard] },
     ])
   ],
   providers: [

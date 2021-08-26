@@ -22,5 +22,7 @@ namespace DotnetCoreSampleA.Data
         }
         public DbSet<DotnetCoreSampleA.Category> Categories { get; set; }
         public DbSet<DotnetCoreSampleA.Models.Product> Product { get; set; }
+        public DbSet<DotnetCoreSampleA.Models.Cart> Cart { get; set; }
+        public DbSet<DotnetCoreSampleA.Models.CartDetails> CartDetails { get; set; }
     }
 }
