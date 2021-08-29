@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { HandleError, HttpErrorHandler } from '../http-error-handler.service';
@@ -24,19 +24,20 @@ const httpOptions = {
 })
 export class CategoriesService {
 
-  heroesUrl = 'https://localhost:44316/api/categories';  // URL to web api
+  heroesUrl = 'api/categories';  // URL to web api
   private handleError: HandleError;
-
+  baseUrl = "";
 
   constructor(
     private http: HttpClient,
-    httpErrorHandler: HttpErrorHandler) {
+    httpErrorHandler: HttpErrorHandler, @Inject('BASE_URL') baseUrl: string) {
+    this.baseUrl = baseUrl;
     this.handleError = httpErrorHandler.createHandleError('CategoriesService');
   }
 
   /** GET heroes from the server */
   getHeroes(): Observable<Categories[]> {
-    return this.http.get<Categories[]>(this.heroesUrl)
+    return this.http.get<Categories[]>(this.baseUrl+this.heroesUrl)
       .pipe(
         catchError(this.handleError('getHeroes', []))
       );
@@ -44,7 +45,7 @@ export class CategoriesService {
 
   /** POST: add a new hero to the database */
   addHero(hero: Categories): Observable<Categories> {
-    return this.http.post<Categories>(this.heroesUrl, hero, httpOptions)
+    return this.http.post<Categories>(this.baseUrl +this.heroesUrl, hero, httpOptions)
       .pipe(
         catchError(this.handleError('addHero', hero))
       );
@@ -52,7 +53,7 @@ export class CategoriesService {
 
   /** POST: add a new hero to the server */
   addHeroX(hero: Categories): Observable<Categories> {
-    return this.http.post<Categories>(this.heroesUrl, hero, httpOptions)
+    return this.http.post<Categories>(this.baseUrl +this.heroesUrl, hero, httpOptions)
       .pipe(
         catchError(this.handleError('addHero', hero))
       );
@@ -63,7 +64,7 @@ export class CategoriesService {
   updateHero(hero: Categories): Observable<Categories> {
     // httpOptions.headers =
     //   httpOptions.headers.set('Authorization', 'my-new-auth-token');
-    const url = `${this.heroesUrl}/${hero.cat_id}`; // PUT api/heroes/42
+    const url = `${this.baseUrl +this.heroesUrl}/${hero.cat_id}`; // PUT api/heroes/42
     return this.http.put<Categories>(url, hero, httpOptions)
       .pipe(
         catchError(this.handleError('updateHero', hero))
@@ -72,7 +73,7 @@ export class CategoriesService {
 
   /** DELETE: delete the hero from the server */
   deleteHero(id: number): Observable<{}> {
-    const url = `${this.heroesUrl}/${id}`; // DELETE api/heroes/42
+    const url = `${this.baseUrl +this.heroesUrl}/${id}`; // DELETE api/heroes/42
     return this.http.delete(url, httpOptions)
       .pipe(
         catchError(this.handleError('deleteHero'))

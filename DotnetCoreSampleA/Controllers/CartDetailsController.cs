@@ -22,13 +22,20 @@ namespace DotnetCoreSampleA.Controllers
         }
 
         // GET: api/CartDetails
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<CartDetails>>> GetCartDetails()
+      /* [HttpGet]
+        public async Task<ActionResult<CartDetails>> GetCartDetails()
         {
-            return await _context.CartDetails.ToListAsync();
+            long pr = 1;
+            var cartDetailsdel = await _context.CartDetails.Where(t => t.CartForeignKey == 2 && t.CD_Pr_id == pr).ToListAsync();//await _context.CartDetails.FindAsync(pr);
+
+            if (cartDetailsdel == null)
+            {
+                return NotFound();
+            }
+            return cartDetailsdel.FirstOrDefault();//await _context.CartDetails.ToListAsync();
         }
 
-        // GET: api/CartDetails/5
+         // GET: api/CartDetails/5
         [HttpGet("{id}")]
         public async Task<ActionResult<CartDetails>> GetCartDetails(long id)
         {
@@ -105,6 +112,6 @@ namespace DotnetCoreSampleA.Controllers
         private bool CartDetailsExists(long id)
         {
             return _context.CartDetails.Any(e => e.CD_id == id);
-        }
+        }*/
     }
 }

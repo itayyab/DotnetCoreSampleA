@@ -18,6 +18,11 @@ import { MessageService } from './message.service';
 import { CategoriesComponent } from './categories/categories.component';
 import { ProductsComponent } from './products/products.component';
 import { CartComponent } from './cart/cart.component';
+import { ShopComponent } from './shop/shop.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ToastComponent } from './toast/toast.component';
+import { CheckoutComponent } from './checkout/checkout.component';
+import { SharedService } from './_services/shared.service';
 
 @NgModule({
   declarations: [
@@ -29,7 +34,10 @@ import { CartComponent } from './cart/cart.component';
     UsersComponent,
     CategoriesComponent,
     ProductsComponent,
-    CartComponent
+    CartComponent,
+    ShopComponent,
+    ToastComponent,
+    CheckoutComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -37,6 +45,7 @@ import { CartComponent } from './cart/cart.component';
     FormsModule,
     ReactiveFormsModule,
     ApiAuthorizationModule,
+    NgbModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'counter', component: CounterComponent },
@@ -45,11 +54,14 @@ import { CartComponent } from './cart/cart.component';
       { path: 'products', component: ProductsComponent },
       { path: 'fetch-data', component: FetchDataComponent, canActivate: [AuthorizeGuard] },
       { path: 'cart', component: CartComponent, canActivate: [AuthorizeGuard] },
+      { path: 'shop', component: ShopComponent, canActivate: [AuthorizeGuard] },
+      { path: 'checkout', component: CheckoutComponent, canActivate: [AuthorizeGuard] },
     ])
   ],
   providers: [
     HttpErrorHandler,
     MessageService,
+    SharedService,
     { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]

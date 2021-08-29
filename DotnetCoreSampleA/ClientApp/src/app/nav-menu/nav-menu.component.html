@@ -3,7 +3,7 @@
     class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3"
   >
     <div class="container">
-      <a class="navbar-brand" [routerLink]="['/']">DotnetCoreSampleA</a>
+      <a class="navbar-brand" [routerLink]="['/']">DotnetCore</a>
       <button
         class="navbar-toggler"
         type="button"
@@ -15,10 +15,8 @@
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div
-        class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse"
-        [ngClass]="{ show: isExpanded }"
-      >
+      <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse"
+           [ngClass]="{ show: isExpanded }">
         <app-login-menu></app-login-menu>
         <ul class="navbar-nav flex-grow">
           <li class="nav-item"
@@ -26,25 +24,36 @@
               [routerLinkActiveOptions]="{ exact: true }">
             <a class="nav-link text-dark" [routerLink]="['/']">Home</a>
           </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/counter']">Counter</a>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Manage
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="nav-link text-dark" [routerLink]="['/categories']">Categories</a>
+              <a class="nav-link text-dark" [routerLink]="['/products']">Products</a>
+            </div>
           </li>
           <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/categories']">Categories</a>
+            <a class="nav-link text-dark" [routerLink]="['/shop']">Shop</a>
           </li>
           <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/fetch-data']">Fetch data</a>
-          </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/products']">Products</a>
-          </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/cart']">Cart</a>
+            <span class="badge badge-pill badge-primary" style="float:right;margin-bottom:-10px;">{{count}}</span>
+            <a class="nav-link text-dark" [routerLink]="['/cart']">Cart <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item">
             <a class="nav-link text-dark" href="/docs">API Docs</a>
           </li>
-        </ul>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Profile
+            </a>
+            <div align="center" class="dropdown-menu well" aria-labelledby="navbarDropdown">
+              <div><img class="img-responsive" style="padding: 2%; max-width: 150px; margin-left: auto; margin-right: auto; display: block;" src="https://e7.pngegg.com/pngimages/442/477/png-clipart-computer-icons-user-profile-avatar-profile-heroes-profile-thumbnail.png" /><a class="change" href="">Change Picture</a></div>
+              <div class="dropdown-divider"></div>
+              <button type="button" class="btn btn-danger" style="margin-left: auto; margin-right: auto; display: block;">Logout</button>
+            </div>
+          </li>
+        </ul>       
       </div>
     </div>
   </nav>

@@ -19,11 +19,11 @@ export class LoginMenuComponent implements OnInit {
     this.isAuthenticated = this.authorizeService.isAuthenticated();
     this.userName = this.authorizeService.getUser().pipe(map(u => u && u.name));
     //console.log("userName:" + JSON.stringify(this.userName));
-     this.authorizeService.getUserSub().subscribe(heroes => {
-       console.log("userSub:" + JSON.stringify(heroes));
+    // this.authorizeService.getUserSub().subscribe(heroes => {
+     //  console.log("userSub:" + JSON.stringify(heroes));
       //(this.products = heroes);
       //  console.log(JSON.stringify(this.products));
-    });
+    //});
     
 
   }

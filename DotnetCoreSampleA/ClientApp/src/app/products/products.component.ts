@@ -6,6 +6,7 @@ import { ProductsService } from './products.service';
 import { CategoriesService } from '../categories/categories.service';
 import { Categories } from '../categories/Categories';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { ToastService } from '../_services/toast.service';
 
 @Component({
   selector: 'app-products',
@@ -30,10 +31,10 @@ export class ProductsComponent implements OnInit, AfterViewChecked {
   loginForm: FormGroup;
   submitted = false;
   loading = false;
+  baseUrl = "";
 
 
   @ViewChild('exampleModal', { static: false }) exampleModal: ElementRef;
-  @ViewChild('toast', { static: false }) toast: ElementRef;
   @ViewChild('namefiled', { static: false }) namefiled: ElementRef;
   @ViewChild('descfiled', { static: false }) descfiled: ElementRef;
   @ViewChild('pricefiled', { static: false }) pricefiled: ElementRef;
@@ -76,8 +77,9 @@ export class ProductsComponent implements OnInit, AfterViewChecked {
       console.log(error);
     });
   }*/
-  constructor(private heroesService: ProductsService, private catService: CategoriesService, @Inject('BASE_URL') baseUrl: string, private formBuilder: FormBuilder, private readonly changeDetectorRef: ChangeDetectorRef) {
-    console.log("BaeURL:" + baseUrl);
+  constructor(private heroesService: ProductsService, private catService: CategoriesService, @Inject('BASE_URL') baseUrl: string, private formBuilder: FormBuilder, private readonly changeDetectorRef: ChangeDetectorRef, public toastService: ToastService) {
+    this.baseUrl = baseUrl;
+   // console.log("BaeURL:" + baseUrl);
   }
   ngAfterViewChecked(): void {
     this.changeDetectorRef.detectChanges();
@@ -135,10 +137,10 @@ export class ProductsComponent implements OnInit, AfterViewChecked {
  
   addX(pr: Product) {
 
-    console.log(JSON.stringify(pr));
+ //   console.log(JSON.stringify(pr));
     this.submitted = true;
     if (this.loginForm.invalid) {
-      console.log("invalid");
+     // console.log("invalid");
       return;
     }
     if (this.file != null && this.file != undefined) {
@@ -151,34 +153,34 @@ export class ProductsComponent implements OnInit, AfterViewChecked {
           const product: Product = {
             pr_id: pr.pr_id, pr_name: pr.pr_name, pr_desc: pr.pr_desc, pr_Picture: hero, pr_price: parseInt(pr.pr_price.toString()), categoryForeignKey: parseInt(pr.category.cat_id.toString()), category: null
           };
-          console.log(JSON.stringify(product));
+          //console.log(JSON.stringify(product));
           this.heroesService.addHeroX(product)
             .subscribe(hero => {
+              hero.category = { cat_id: pr.category.cat_id, cat_name: catname.cat_name };
               //console.log(hero.email);
               //  console.log("DAta:" + JSON.stringify(hero));
              // hero.category.cat_name = catname.cat_name;
               this.products.push(hero);
               $(this.exampleModal.nativeElement).modal('hide');
-              this.message = 'Product details added';
-              $(this.toast.nativeElement).toast('show');
+              this.showSuccess(pr.pr_name, 'Product added');
             });
           //  console.log("Fileuploaded" + hero);
           //  return hero;
         });
     } else {
-      console.log(this.file); 
+     // console.log(this.file); 
       var catname = this.categories.find(x => x.cat_id == pr.category.cat_id);
       const product: Product = {
         pr_id: pr.pr_id, pr_name: pr.pr_name, pr_desc: pr.pr_desc, pr_Picture: "StaticFiles/Images/no_image.png", pr_price: parseInt(pr.pr_price.toString()), categoryForeignKey: parseInt(pr.category.cat_id.toString()), category: null
           };
           this.heroesService.addHeroX(product)
             .subscribe(hero => {
+              hero.category = { cat_id: pr.category.cat_id, cat_name: catname.cat_name };
               //console.log(hero.email);
               //  console.log("DAta:" + JSON.stringify(hero));
               this.products.push(hero);
               $(this.exampleModal.nativeElement).modal('hide');
-              this.message = 'Product details added';
-              $(this.toast.nativeElement).toast('show');
+              this.showSuccess(pr.pr_name, 'Product added');
             });
           //  console.log("Fileuploaded" + hero);
           //  return hero;
@@ -204,7 +206,7 @@ export class ProductsComponent implements OnInit, AfterViewChecked {
       });*/
   }
   open(person: Product) {
-    console.log(JSON.stringify(person));
+    //console.log(JSON.stringify(person));
     this.edit = true;
     this.title = 'Edit Product';
     this.name = person.pr_name;
@@ -227,17 +229,16 @@ export class ProductsComponent implements OnInit, AfterViewChecked {
     //  this.announce();
   }
   selectChange() {
-    console.log(this.selectfield.nativeElement.Value);
+   // console.log(this.selectfield.nativeElement.Value);
   }
   update(pr: Product) {
-
-    console.log("RX:"+JSON.stringify(pr));
+  //  console.log("RX:"+JSON.stringify(pr));
     this.submitted = true;
     if (this.edit) {
       //      console.log(person);
       
       if (this.loginForm.invalid) {
-        console.log("invalid");
+        //console.log("invalid");
         return;
       }
       if (this.file != null && this.file != undefined) {
@@ -256,8 +257,8 @@ export class ProductsComponent implements OnInit, AfterViewChecked {
                   //  console.log("DAta:" + JSON.stringify(hero));
                   this.getProdcuts();
                   $(this.exampleModal.nativeElement).modal('hide');
-                  this.message = 'Product details updated';
-                  $(this.toast.nativeElement).toast('show');
+                  this.showSuccess(pr.pr_name, 'Product updated');
+                 // $(this.toast.nativeElement).toast('show');
                 });
               //  console.log("Fileuploaded" + hero);
               //  return hero;
@@ -268,15 +269,14 @@ export class ProductsComponent implements OnInit, AfterViewChecked {
         const product: Product = {
           pr_id: pr.pr_id, pr_name: pr.pr_name, pr_desc: pr.pr_desc, pr_Picture: this.pic, pr_price: parseInt(pr.pr_price.toString()), categoryForeignKey: parseInt(pr.category.cat_id.toString()), category: null
         };
-        console.log("RX2:" + JSON.stringify(pr));
+       // console.log("RX2:" + JSON.stringify(pr));
         this.heroesService.updateHero(product)
                 .subscribe(hero => {
                   //console.log(hero.email);
                   //  console.log("DAta:" + JSON.stringify(hero));
                   this.getProdcuts();
                   $(this.exampleModal.nativeElement).modal('hide');
-                  this.message = 'Product details updated';
-                  $(this.toast.nativeElement).toast('show');
+                  this.showSuccess(pr.pr_name, 'Product updated');
                 });
               //  console.log("Fileuploaded" + hero);
               //  return hero;
@@ -322,17 +322,16 @@ export class ProductsComponent implements OnInit, AfterViewChecked {
   }
   get loginFormControl() { return this.loginForm.controls; }
   delete(hero: Product): void {
-    console.log('size' + this.products.length);
+  //  console.log('size' + this.products.length);
     this.products = this.products.filter(h => h.pr_id !== hero.pr_id);
-    console.log('size' + this.products.length);
+  //  console.log('size' + this.products.length);
     // this.heroes.re
     this.heroesService
       .deleteHero(hero.pr_id)
       .subscribe();
     $(this.exampleModal.nativeElement).modal('hide');
     // this.getHeroes();
-    this.message = 'Product deleted';
-    $(this.toast.nativeElement).toast('show');
+    this.showError(hero.pr_name);
     /*
     // oops ... subscribe() is missing so nothing happens
     this.heroesService.deleteHero(hero.id);
@@ -340,13 +339,29 @@ export class ProductsComponent implements OnInit, AfterViewChecked {
     this.closeModal();
   }
   public getCat(catid: number): string {
-    console.log("CAT:"+catid);
+   // console.log("CAT:"+catid);
     var catname = this.categories.find(x => x.cat_id == catid).cat_name;
     // var cat: Categories = { cat_id: catid, cat_name: catname };
     return catname;
   }
    
   public createImgPath = (serverPath: string) => {
-    return 'https://localhost:44316/'+serverPath;
+    return this.baseUrl+serverPath;
+  }
+  showSuccess(product, header) {
+    this.toastService.show(product, {
+      classname: 'bg-success text-light',
+      delay: 5000,
+      autohide: true,
+      headertext: header
+    });
+  }
+  showError(product) {
+    this.toastService.show(product, {
+      classname: 'bg-danger text-light',
+      delay: 2000,
+      autohide: true,
+      headertext: 'Product  deleted'
+    });
   }
 }
