@@ -7,22 +7,10 @@ import { HomeService } from './home.service';
   templateUrl: './home.component.html',
 })
 export class HomeComponent implements OnInit {
-  products: Product[];
-  constructor(private heroesService: HomeService, @Inject('BASE_URL') baseUrl: string) {
-    console.log("BaeURL:" + baseUrl);
+  constructor() {
   }
 
   ngOnInit() {
-    this.getProdcuts();
   }
-  public createImgPath = (serverPath: string) => {
-    return 'https://localhost:44316/' + serverPath;
-  }
-  getProdcuts(): void {
-    this.heroesService.getHeroes()
-      .subscribe(heroes => {
-        (this.products = heroes);
-        //  console.log(JSON.stringify(this.products));
-      });
-  }
+ 
 }

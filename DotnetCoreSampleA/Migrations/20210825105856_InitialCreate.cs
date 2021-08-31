@@ -49,6 +49,22 @@ namespace DotnetCoreSampleA.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Cart",
+                columns: table => new
+                {
+                    Cart_id = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserID = table.Column<string>(nullable: true),
+                    TotalQty = table.Column<long>(nullable: false),
+                    TotalAmount = table.Column<long>(nullable: false),
+                    Status = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cart", x => x.Cart_id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Categories",
                 columns: table => new
                 {
@@ -93,20 +109,6 @@ namespace DotnetCoreSampleA.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PersistedGrants", x => x.Key);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "User",
-                columns: table => new
-                {
-                    id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    email = table.Column<string>(nullable: true),
-                    name = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_User", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -238,6 +240,36 @@ namespace DotnetCoreSampleA.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "CartDetails",
+                columns: table => new
+                {
+                    CD_id = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CD_Pr_id = table.Column<long>(nullable: false),
+                    CD_Pr_Qty = table.Column<long>(nullable: false),
+                    CD_Pr_price = table.Column<long>(nullable: false),
+                    CD_Pr_Amnt = table.Column<long>(nullable: false),
+                    CartForeignKey = table.Column<long>(nullable: false),
+                    ProductForeignKey = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CartDetails", x => x.CD_id);
+                    table.ForeignKey(
+                        name: "FK_CartDetails_Cart_CartForeignKey",
+                        column: x => x.CartForeignKey,
+                        principalTable: "Cart",
+                        principalColumn: "Cart_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CartDetails_Product_ProductForeignKey",
+                        column: x => x.ProductForeignKey,
+                        principalTable: "Product",
+                        principalColumn: "Pr_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -276,6 +308,16 @@ namespace DotnetCoreSampleA.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CartDetails_CartForeignKey",
+                table: "CartDetails",
+                column: "CartForeignKey");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CartDetails_ProductForeignKey",
+                table: "CartDetails",
+                column: "ProductForeignKey");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DeviceCodes_DeviceCode",
@@ -322,22 +364,25 @@ namespace DotnetCoreSampleA.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "CartDetails");
+
+            migrationBuilder.DropTable(
                 name: "DeviceCodes");
 
             migrationBuilder.DropTable(
                 name: "PersistedGrants");
 
             migrationBuilder.DropTable(
-                name: "Product");
-
-            migrationBuilder.DropTable(
-                name: "User");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Cart");
+
+            migrationBuilder.DropTable(
+                name: "Product");
 
             migrationBuilder.DropTable(
                 name: "Categories");

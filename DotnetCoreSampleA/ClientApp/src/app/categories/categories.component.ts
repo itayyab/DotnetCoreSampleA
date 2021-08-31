@@ -3,6 +3,7 @@ import $ from 'jquery';
 import 'bootstrap';
 import { Categories } from './Categories';
 import { CategoriesService } from './categories.service';
+import { ToastService } from '../_services/toast.service';
 
 @Component({
   selector: 'app-categories',
@@ -10,8 +11,6 @@ import { CategoriesService } from './categories.service';
   styleUrls: ['./categories.component.css']
 })
 export class CategoriesComponent implements OnInit {
-
-
   heroes: Categories[];
   editHero: Categories; // the hero currently being edited
   title = '';
@@ -19,13 +18,11 @@ export class CategoriesComponent implements OnInit {
   id = 0;
   message = '';
   edit = false;
-
   @ViewChild('exampleModal', { static: false }) exampleModal: ElementRef;
-  @ViewChild('toast', { static: false }) toast: ElementRef;
   @ViewChild('namefiled', { static: false }) namefiled: ElementRef;
   @ViewChild('delbtn', { static: false }) delbtn: ElementRef;
-  constructor(private heroesService: CategoriesService, @Inject('BASE_URL') baseUrl: string) {
-    console.log("BaeURL:"+baseUrl);
+  constructor(private heroesService: CategoriesService, @Inject('BASE_URL') baseUrl: string,public toastService: ToastService) {
+   // console.log("BaeURL:"+baseUrl);
   }
   ngOnInit() {
     this.getHeroes();
@@ -40,31 +37,8 @@ export class CategoriesComponent implements OnInit {
     this.title = 'Add Category';
     this.name = '';
     this.id = 0;
-
     $(this.exampleModal.nativeElement).modal('show');
     //this.delbtn.nativeElement = false;
-  }
-  add(newHero: Categories): void {
-    this.editHero = undefined;
-    //namex = namex.trim();
-    //if (!namex) {
-    //  return;
-    //}
-
-    //// The server will generate the id for this new hero
-    //const newHero: User = {
-    //  id: 1,
-    //  name: namex
-    //} as User;
-    this.heroesService
-      .addHero(newHero)
-      .subscribe(hero => {
-        this.heroes.push(hero);
-        $(this.exampleModal.nativeElement).modal('hide');
-        this.message = 'Category details added';
-        $(this.toast.nativeElement).toast('show');
-      });
-
   }
 
   open(person: Categories) {
@@ -73,7 +47,6 @@ export class CategoriesComponent implements OnInit {
     this.name = person.cat_name;
     //this.email = person.email;
     this.id = person.cat_id;
-
     $(this.exampleModal.nativeElement).modal('show');
     // this.delbtn.nativeElement = true;
     // const modalRef = this.modalService.open(ModalComponent);
@@ -93,24 +66,11 @@ export class CategoriesComponent implements OnInit {
         .updateHero(person)
         .subscribe(hero => {
           //   console.log(hero);
-          $(this.exampleModal.nativeElement).modal('hide');
+          this.closeModal();
           this.getHeroes();
-          this.message = 'Category details updated';
-          $(this.toast.nativeElement).toast('show');
-
-          //  this.sendMessageToParent('messageToSendC');
-          // replace the hero in the heroes list with update from server
-          // const ix = hero ? this.person.findIndex(h => h.id === hero.id) : -1;
-          // if (ix > -1) {
-          //   this.person[ix] = hero;/   }
+          this.showSuccess(person.cat_name,'Category updated');
         });
-      // this.editHero = undefined;
-      // }
-    } else {
-      this.add(this.namefiled.nativeElement.value);
-    }
-
-
+    } 
   }
   closeModal() {
     $(this.exampleModal.nativeElement).modal('hide');
@@ -122,25 +82,22 @@ export class CategoriesComponent implements OnInit {
       .subscribe(hero => {
         //console.log(hero.email);
         this.heroes.push(hero);
-        $(this.exampleModal.nativeElement).modal('hide');
-        this.message = 'Category details added';
-        $(this.toast.nativeElement).toast('show');
+        this.closeModal();
+        this.showSuccess(name,'Category added');
       });
   }
 
 
   delete(hero: Categories): void {
-    console.log('size' + this.heroes.length);
+   // console.log('size' + this.heroes.length);
     this.heroes = this.heroes.filter(h => h.cat_id !== hero.cat_id);
-    console.log('size' + this.heroes.length);
+   // console.log('size' + this.heroes.length);
     // this.heroes.re
     this.heroesService
       .deleteHero(hero.cat_id)
       .subscribe();
-    $(this.exampleModal.nativeElement).modal('hide');
-    // this.getHeroes();
-    this.message = 'Category deleted';
-    $(this.toast.nativeElement).toast('show');
+    this.closeModal();
+    this.showError(hero.cat_name);
     /*
     // oops ... subscribe() is missing so nothing happens
     this.heroesService.deleteHero(hero.id);
@@ -150,4 +107,20 @@ export class CategoriesComponent implements OnInit {
   //goToComponentB(people): void {
   //  this.router.navigate(['/peopledetails'], { state: { data: { people } } });
   //}
+  showSuccess(product,header) {
+    this.toastService.show(product, {
+      classname: 'bg-success text-light',
+      delay: 5000,
+      autohide: true,
+      headertext: header
+    });
+  }
+  showError(product) {
+    this.toastService.show(product, {
+      classname: 'bg-danger text-light',
+      delay: 2000,
+      autohide: true,
+      headertext: 'Category deleted'
+    });
+  }
 }

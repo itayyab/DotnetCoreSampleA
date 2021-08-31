@@ -1,0 +1,52 @@
+<div class="container">
+  <app-toasts></app-toasts>
+  <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+      <h1 class="display-4">Cart</h1>
+    </div>
+  </div>
+  <div class="container">
+    <table id="cart" class="table table-hover table-condensed">
+      <thead>
+        <tr>
+          <th style="width:50%">Product</th>
+          <th style="width:10%">Price</th>
+          <th style="width:8%">Quantity</th>
+          <th style="width:22%" class="text-center">Subtotal</th>
+          <th style="width:10%"></th>
+        </tr>
+      </thead>
+      <tbody *ngFor="let p of heroes">
+        <tr *ngFor="let onu of p.cartDetails">
+          <td data-th="Product">
+            <div class="row">
+              <div class="col-sm-2 hidden-xs"><img [src]="createImgPath(onu.product.pr_Picture)" width="150" height="150" alt="..." class="img-responsive" /></div>
+              <div class="col-sm-10">
+                <h4 class="nomargin">{{ onu.product.pr_name}}</h4>
+                <p>{{ onu.product.pr_desc}}</p>
+              </div>
+            </div>
+          </td>
+          <td data-th="Price">{{onu.product.pr_price}}</td>
+          <td data-th="Quantity">{{ onu.cD_Pr_Qty}}</td>
+          <td data-th="Subtotal" class="text-center">{{ (onu.cD_Pr_Qty)*(onu.product.pr_price) }}</td>
+          <td class="actions" data-th="">
+            <button (click)="delfromCart(onu.cD_Pr_id,onu.product.pr_name)" class="btn btn-danger btn-sm">X</button>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="d-block d-sm-none">
+          <td class="text-center"><strong>Total {{gettotal()}}</strong></td>
+        </tr>
+        <tr>
+          <td><a [routerLink]="['/shop']" class="btn btn-warning">< Continue Shopping</a></td>
+          <td colspan="2" class="hidden-xs"></td>
+          <td class="d-none d-sm-block text-center"><strong>Total {{gettotal()}}</strong></td>
+          <td><button  *ngIf="heroes != undefined && heroes.length>0" (click)="checkoutCart()" class="btn btn-success">Checkout</button></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+

@@ -101,6 +101,64 @@ namespace DotnetCoreSampleA.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("DotnetCoreSampleA.Models.Cart", b =>
+                {
+                    b.Property<long>("Cart_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TotalAmount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TotalQty")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("UserID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Cart_id");
+
+                    b.ToTable("Cart");
+                });
+
+            modelBuilder.Entity("DotnetCoreSampleA.Models.CartDetails", b =>
+                {
+                    b.Property<long>("CD_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CD_Pr_Amnt")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("CD_Pr_Qty")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("CD_Pr_id")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("CD_Pr_price")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("CartForeignKey")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ProductForeignKey")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("CD_id");
+
+                    b.HasIndex("CartForeignKey");
+
+                    b.HasIndex("ProductForeignKey");
+
+                    b.ToTable("CartDetails");
+                });
+
             modelBuilder.Entity("DotnetCoreSampleA.Models.Product", b =>
                 {
                     b.Property<long>("Pr_id")
@@ -128,24 +186,6 @@ namespace DotnetCoreSampleA.Migrations
                     b.HasIndex("CategoryForeignKey");
 
                     b.ToTable("Product");
-                });
-
-            modelBuilder.Entity("DotnetCoreSampleA.User", b =>
-                {
-                    b.Property<long>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("IdentityServer4.EntityFramework.Entities.DeviceFlowCodes", b =>
@@ -363,6 +403,21 @@ namespace DotnetCoreSampleA.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("DotnetCoreSampleA.Models.CartDetails", b =>
+                {
+                    b.HasOne("DotnetCoreSampleA.Models.Cart", "Cart")
+                        .WithMany("CartDetails")
+                        .HasForeignKey("CartForeignKey")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DotnetCoreSampleA.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductForeignKey")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DotnetCoreSampleA.Models.Product", b =>
