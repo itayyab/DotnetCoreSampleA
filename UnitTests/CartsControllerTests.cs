@@ -34,6 +34,7 @@ namespace UnitTests
             this.output = output;
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                  .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                 .EnableSensitiveDataLogging()
                  .Options;
             OperationalStoreOptions storeOptions = new OperationalStoreOptions
             {
@@ -63,69 +64,331 @@ namespace UnitTests
 
 
                 var one = new Product();
-                one.Pr_id = 3;
+                one.Pr_id = 1;
                 one.Pr_name = "Test";
                 one.Pr_price = 100;
                 one.Pr_Picture = "";
                 one.Pr_desc = "Test desc";
 
                 var two = new Product();
-                two.Pr_id = 4;
+                two.Pr_id =2;
                 two.Pr_name = "Test";
                 two.Pr_price = 100;
                 two.Pr_Picture = "";
                 two.Pr_desc = "Test desc";
                 context.AddRange(one, two);
                 context.SaveChanges();
+                
             }
         }
          [Fact]
-         public async Task Save_new_Product()
+         public async Task PostCart_Test_NewCart()
          {
              using (var context = applicationDbContext)
              {
-                ILogger<ProductsController> logger = new Logger<ProductsController>(new NullLoggerFactory());
-                var controller = new ProductsController(context,logger);
-                Product cat = new Product();
-                 cat.Pr_id = 3;
-                 cat.Pr_name = "Test";
-                cat.Pr_price =100;
-                cat.Pr_Picture = "";
-                cat.Pr_desc = "Test desc";
-               var actionResult = await controller.PostProduct(cat);         
-                 var item = (Product)((CreatedAtActionResult)actionResult.Result).Value;
-                 output.WriteLine("This is output from {0}", item.Pr_name);
-                 Xunit.Assert.IsType<Product>(item);
-                 Xunit.Assert.Equal(cat.Pr_id, item.Pr_id);
-                 Xunit.Assert.Equal(cat.Pr_name, item.Pr_name);
+                ILogger<CartsController> logger = new Logger<CartsController>(new NullLoggerFactory());
+                var controller = new CartsController(context,logger);
+                
+                var cartdetils1 = new CartDetails { CD_id = 1, CD_Pr_id = 1, ProductForeignKey = 1, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 1 };
+                List<CartDetails> cartx = new List<CartDetails>();
+                cartx.Add(cartdetils1);
+                var manager = new Cart { Cart_id = 1, UserID = "123", TotalQty = 2, TotalAmount = 100, Status = "PENDING",CartDetails=cartx };
+
+                var actionResult = await controller.PostCart(manager);         
+                 var item = (Cart)((CreatedAtActionResult)actionResult.Result).Value;
+                 output.WriteLine("This is output from {0}", item.Cart_id);
+                 Xunit.Assert.IsType<Cart>(item);
+                 Xunit.Assert.Equal(manager.Cart_id, item.Cart_id);
+                 //Xunit.Assert.Equal(cat.Pr_name, item.Pr_name);
              }
          }
-        
-       [Fact]
-        public async Task Get_products()
+        [Fact]
+        public async Task PostCart_Test_CartAlreadyExists()
+        {
+            using (var context = applicationDbContext)
+            {
+                var manager = new Cart { Cart_id = 1, UserID = "123", TotalQty = 2, TotalAmount = 100, Status = "PENDING" };
+                var cartdetils1 = new CartDetails { CD_id = 1, CD_Pr_id = 2, ProductForeignKey = 2, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 1 };
+                context.Cart.Add(manager);
+                context.CartDetails.Add(cartdetils1);
+               // context.Entry<CartDetails>(cartdetils1).State = EntityState.Detached;
+               // context.Entry<Cart>(manager).State = EntityState.Detached;
+                context.SaveChanges();
+                context.Entry<CartDetails>(cartdetils1).State = EntityState.Detached;
+                context.Entry<Cart>(manager).State = EntityState.Detached;
+
+
+                ILogger<CartsController> logger = new Logger<CartsController>(new NullLoggerFactory());
+                var controller = new CartsController(context, logger);
+
+
+                var cartdetilsnew = new CartDetails { CD_id = 0, CD_Pr_id = 1, ProductForeignKey = 1, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 1};
+                List<CartDetails> cartx = new List<CartDetails>();
+                cartx.Add(cartdetilsnew);
+                var managernew = new Cart { Cart_id = 1, UserID = "123", TotalQty = 2, TotalAmount = 100, Status = "PENDING", CartDetails = cartx };
+
+                var actionResult = await controller.PostCart(managernew);
+                var item = (Cart)((CreatedAtActionResult)actionResult.Result).Value;
+                output.WriteLine("This is output from {0}", item.Cart_id);
+                Xunit.Assert.IsType<Cart>(item);
+                Xunit.Assert.Equal(manager.Cart_id, item.Cart_id);
+                //Xunit.Assert.Equal(cat.Pr_name, item.Pr_name);
+            }
+        }
+        [Fact]
+        public async Task DeleteProductFromCart_Test_CartNotFound()
+        {
+            using (var context = applicationDbContext)
+            {
+            
+                ILogger<CartsController> logger = new Logger<CartsController>(new NullLoggerFactory());
+                var controller = new CartsController(context, logger);
+                var cartdetilsnew = new CartDetails { CD_id = 0, CD_Pr_id = 1, ProductForeignKey = 1, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 1 };
+                List<CartDetails> cartx = new List<CartDetails>();
+                cartx.Add(cartdetilsnew);
+                var managernew = new Cart { Cart_id = 1, UserID = "123456", TotalQty = 2, TotalAmount = 100, Status = "PENDING", CartDetails = cartx };
+
+                var actionResult = await controller.DetelteProducctFromCart(managernew);
+                 var item = (NotFoundResult)((NotFoundResult)actionResult.Result);
+                // output.WriteLine("This is output from {0}", item.Cart_id);
+                // Xunit.Assert.IsType<Cart>(item);
+                Xunit.Assert.IsAssignableFrom<NotFoundResult>(item);
+            }
+        }
+        [Fact]
+        public async Task DeleteProductFromCart_Test_ProductNotFound()
+        {
+            using (var context = applicationDbContext)
+            {
+                var manager = new Cart { Cart_id = 1, UserID = "123", TotalQty = 2, TotalAmount = 100, Status = "PENDING" };
+                var cartdetils1 = new CartDetails { CD_id = 1, CD_Pr_id = 1, ProductForeignKey = 1, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 1 };
+                context.Cart.Add(manager);
+                context.CartDetails.Add(cartdetils1);
+                
+                context.SaveChanges();
+
+                 context.Entry<CartDetails>(cartdetils1).State = EntityState.Detached;
+                  context.Entry<Cart>(manager).State = EntityState.Detached;
+
+                ILogger<CartsController> logger = new Logger<CartsController>(new NullLoggerFactory());
+                var controller = new CartsController(context, logger);
+                
+                var cartdetilsnew = new CartDetails { CD_id = 1, CD_Pr_id =4, ProductForeignKey = 4, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 1 };
+                List<CartDetails> cartx = new List<CartDetails>();
+                cartx.Add(cartdetilsnew);
+                var managernew = new Cart { Cart_id = 1, UserID = "123", TotalQty = 2, TotalAmount = 100, Status = "PENDING", CartDetails = cartx };
+
+                var actionResult = await controller.DetelteProducctFromCart(managernew);
+                var item = (NotFoundResult)((NotFoundResult)actionResult.Result);
+                // output.WriteLine("This is output from {0}", item.Cart_id);
+                // Xunit.Assert.IsType<Cart>(item);
+                Xunit.Assert.IsAssignableFrom<NotFoundResult>(item);
+                // Xunit.Assert.Equal(manager.Cart_id, item.Cart_id);
+                //Xunit.Assert.Equal(cat.Pr_name, item.Pr_name);
+            }
+        }
+        [Fact]
+        public async Task DeleteProductFromCart_Test_CartProductExists()
+        {
+            using (var context = applicationDbContext)
+            {
+                var manager = new Cart { Cart_id = 1, UserID = "123", TotalQty = 2, TotalAmount = 100, Status = "PENDING" };
+                var cartdetils1 = new CartDetails { CD_id = 1, CD_Pr_id = 1, ProductForeignKey = 1, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 1 };
+                context.Cart.Add(manager);
+                context.CartDetails.Add(cartdetils1);
+
+                context.SaveChanges();
+
+                context.Entry<CartDetails>(cartdetils1).State = EntityState.Detached;
+                context.Entry<Cart>(manager).State = EntityState.Detached;
+
+                ILogger<CartsController> logger = new Logger<CartsController>(new NullLoggerFactory());
+                var controller = new CartsController(context, logger);
+
+              
+
+                var cartdetilsnew = new CartDetails { CD_id = 1, CD_Pr_id = 1, ProductForeignKey = 1, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 1 };
+                List<CartDetails> cartx = new List<CartDetails>();
+                cartx.Add(cartdetilsnew);
+                var managernew = new Cart { Cart_id = 1, UserID = "123", TotalQty = 2, TotalAmount = 100, Status = "PENDING", CartDetails = cartx };
+
+                var actionResult = await controller.DetelteProducctFromCart(managernew);
+              /*  var check = controller.CheckCartDetailsProductExists(1,1);
+              Xunit.Assert.True(check);
+              output.WriteLine("This is output from {0}", check);*/
+                var item = (Cart)((CreatedAtActionResult)actionResult.Result).Value;
+                output.WriteLine("This is output from {0}", item.Cart_id);
+                Xunit.Assert.IsType<Cart>(item);
+                Xunit.Assert.Equal(manager.Cart_id, item.Cart_id);
+            }
+        }
+       /* [Fact]
+        public async Task DeleteProductFromCart_Test_CartCartdetailsNotFound()
+        {
+            using (var context = applicationDbContext)
+            {
+                var manager = new Cart { Cart_id = 1, UserID = "123", TotalQty = 2, TotalAmount = 100, Status = "PENDING" };
+                var cartdetils1 = new CartDetails { CD_id = 1, CD_Pr_id = 1, ProductForeignKey = 1, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 1 };
+                context.Cart.Add(manager);
+                context.CartDetails.Add(cartdetils1);
+
+                context.SaveChanges();
+
+                context.Entry<CartDetails>(cartdetils1).State = EntityState.Detached;
+                context.Entry<Cart>(manager).State = EntityState.Detached;
+
+                ILogger<CartsController> logger = new Logger<CartsController>(new NullLoggerFactory());
+                var controller = new CartsController(context, logger);
+
+
+
+                var cartdetilsnew = new CartDetails { CD_id = 1, CD_Pr_id = 1, ProductForeignKey = 1, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 1 };
+                List<CartDetails> cartx = new List<CartDetails>();
+                cartx.Add(cartdetilsnew);
+                var managernew = new Cart { Cart_id = 1, UserID = "123", TotalQty = 2, TotalAmount = 100, Status = "PENDING", CartDetails = cartx };
+
+                var actionResult = await controller.DetelteProducctFromCart(managernew);
+                var item = (NotFoundResult)((NotFoundResult)actionResult.Result);
+                // output.WriteLine("This is output from {0}", item.Cart_id);
+                // Xunit.Assert.IsType<Cart>(item);
+                Xunit.Assert.IsAssignableFrom<NotFoundResult>(item);
+            }
+        }*/
+        [Fact]
+        public async Task PostCart_Test_CartProductAlreadyExists()
+        {
+            using (var context = applicationDbContext)
+            {
+                var manager = new Cart { Cart_id = 1, UserID = "123", TotalQty = 2, TotalAmount = 100, Status = "PENDING" };
+                var cartdetils1 = new CartDetails { CD_id = 1, CD_Pr_id = 1, ProductForeignKey = 1, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 1 };
+                context.Cart.Add(manager);
+                context.CartDetails.Add(cartdetils1);
+
+                context.SaveChanges();
+
+                context.Entry<CartDetails>(cartdetils1).State = EntityState.Detached;
+                context.Entry<Cart>(manager).State = EntityState.Detached;
+
+                ILogger<CartsController> logger = new Logger<CartsController>(new NullLoggerFactory());
+                var controller = new CartsController(context, logger);
+
+                var cartdetilsnew = new CartDetails { CD_id = 1, CD_Pr_id = 1, ProductForeignKey = 1, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 1 };
+                List<CartDetails> cartx = new List<CartDetails>();
+                cartx.Add(cartdetilsnew);
+                var managernew = new Cart { Cart_id = 1, UserID = "123", TotalQty = 2, TotalAmount = 100, Status = "PENDING", CartDetails = cartx };
+
+                var actionResult = await controller.PostCart(managernew);
+                var item = (Cart)((CreatedAtActionResult)actionResult.Result).Value;
+                output.WriteLine("This is output from {0}", item.Cart_id);
+                Xunit.Assert.IsType<Cart>(item);
+                // Xunit.Assert.Equal(manager.Cart_id, item.Cart_id);
+                //Xunit.Assert.Equal(cat.Pr_name, item.Pr_name);
+            }
+        }
+        [Fact]
+        public async Task CheckoutCart_Test_NotFound()
+        {
+            using (var context = applicationDbContext)
+            {
+
+                ILogger<CartsController> logger = new Logger<CartsController>(new NullLoggerFactory());
+                var controller = new CartsController(context, logger);
+
+                var cartdetilsnew = new CartDetails { CD_id = 1, CD_Pr_id = 1, ProductForeignKey = 1, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 1 };
+                List<CartDetails> cartx = new List<CartDetails>();
+                cartx.Add(cartdetilsnew);
+                var managernew = new Cart { Cart_id = 1, UserID = "123", TotalQty = 2, TotalAmount = 100, Status = "PENDING", CartDetails = cartx };
+
+                var actionResult = await controller.CheckoutCart(managernew);
+                var item = (NotFoundResult)((NotFoundResult)actionResult.Result);
+                // output.WriteLine("This is output from {0}", item.Cart_id);
+                // Xunit.Assert.IsType<Cart>(item);
+                Xunit.Assert.IsAssignableFrom<NotFoundResult>(item);
+            }
+        }
+        [Fact]
+        public async Task CheckoutCart_Test_Sucess()
+        {
+            using (var context = applicationDbContext)
+            {
+                var manager = new Cart { Cart_id = 1, UserID = "123", TotalQty = 2, TotalAmount = 100, Status = "PENDING" };
+                var cartdetils1 = new CartDetails { CD_id = 1, CD_Pr_id = 1, ProductForeignKey = 1, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 1 };
+                context.Cart.Add(manager);
+                context.CartDetails.Add(cartdetils1);
+
+                context.SaveChanges();
+
+                context.Entry<CartDetails>(cartdetils1).State = EntityState.Detached;
+                context.Entry<Cart>(manager).State = EntityState.Detached;
+
+                ILogger<CartsController> logger = new Logger<CartsController>(new NullLoggerFactory());
+                var controller = new CartsController(context, logger);
+
+                var cartdetilsnew = new CartDetails { CD_id = 1, CD_Pr_id = 1, ProductForeignKey = 1, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 1 };
+                List<CartDetails> cartx = new List<CartDetails>();
+                cartx.Add(cartdetilsnew);
+                var managernew = new Cart { Cart_id = 1, UserID = "123", TotalQty = 2, TotalAmount = 100, Status = "PENDING", CartDetails = cartx };
+
+                var actionResult = await controller.CheckoutCart(managernew);
+                var item = (Cart)((CreatedAtActionResult)actionResult.Result).Value;
+                output.WriteLine("This is output from {0}", item.Cart_id);
+                Xunit.Assert.IsType<Cart>(item);
+                // Xunit.Assert.Equal(manager.Cart_id, item.Cart_id);
+                //Xunit.Assert.Equal(cat.Pr_name, item.Pr_name);
+            }
+        }
+        [Fact]
+        public async Task Get_Cart_Count()
         {
             using (var context = applicationDbContext)
             {
                 // Given
-                var manager = new Product { Pr_id = 3, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc" };
-                var manager2 = new Product { Pr_id = 4, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc" };
-                context.Product.AddRange(manager,manager2);
+                var manager = new Cart { Cart_id=1,UserID="123",TotalQty=2,TotalAmount=100,Status= "PENDING" };
+                var manager2 = new Cart { Cart_id = 2, UserID = "1234", TotalQty = 2, TotalAmount = 100, Status = "PENDING" };
+                context.Cart.AddRange(manager,manager2);
                 context.SaveChanges();
                 using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-                var logger = loggerFactory.CreateLogger<ProductsController>();
-                var controller = new ProductsController(context,logger);
+                var logger = loggerFactory.CreateLogger<CartsController>();
+                var controller = new CartsController(context,logger);
 
-                  var actionResult = await controller.GetProduct();
+                  var actionResult = await controller.GetCartCount("123");
 
-                var lstUsers = ((OkObjectResult)actionResult.Result).Value as IEnumerable<Product>;
+                //  var lstUsers = ((OkObjectResult)actionResult.Result).Value;
+                var lstUsers = ((OkObjectResult)actionResult.Result).Value as long?;
+              //var xx=(long)((OkObjectResult)actionResult.Result).Value;
                 Xunit.Assert.IsAssignableFrom<OkObjectResult>(actionResult.Result);
-                Xunit.Assert.Equal(2, lstUsers.Count());
+                Xunit.Assert.Equal(2, lstUsers);
             }
 
            
         }
         [Fact]
-        public async Task GetProductsByCategory()
+        public async Task Get_Cart_Count_Zero()
+        {
+            using (var context = applicationDbContext)
+            {
+                // Given
+                var manager = new Cart { Cart_id = 1, UserID = "123", TotalQty = 2, TotalAmount = 100, Status = "PENDING" };
+                var manager2 = new Cart { Cart_id = 2, UserID = "1234", TotalQty = 2, TotalAmount = 100, Status = "PENDING" };
+                context.Cart.AddRange(manager, manager2);
+                context.SaveChanges();
+                using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+                var logger = loggerFactory.CreateLogger<CartsController>();
+                var controller = new CartsController(context, logger);
+
+                var actionResult = await controller.GetCartCount("12346");
+
+                //  var lstUsers = ((OkObjectResult)actionResult.Result).Value;
+                var lstUsers = (long)((OkObjectResult)actionResult.Result).Value;
+                //var xx=(long)((OkObjectResult)actionResult.Result).Value;
+                Xunit.Assert.IsAssignableFrom<OkObjectResult>(actionResult.Result);
+                Xunit.Assert.Equal(0, lstUsers);
+            }
+
+
+        }
+        [Fact]
+        public async Task GetCart()
         {
             using (var context = applicationDbContext)
             {
@@ -137,23 +400,26 @@ namespace UnitTests
                 //context.Categories.Add(manager2);
                 context.SaveChanges();
                 // Given
-                var manager = new Product { Pr_id = 3, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc", CategoryForeignKey = 1 };
-                var manager2 = new Product { Pr_id = 4, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc", CategoryForeignKey=2 };
-                context.Product.AddRange(manager, manager2);
+                var manager = new Cart { Cart_id = 1, UserID = "123", TotalQty = 2, TotalAmount = 100, Status = "PENDING" };
+                var manager2 = new Cart { Cart_id = 2, UserID = "1234", TotalQty = 2, TotalAmount = 100, Status = "PENDING" };
+                var cartdetils1 = new CartDetails { CD_id = 1, CD_Pr_id = 1, ProductForeignKey = 1, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 1 };
+                context.Cart.AddRange(manager, manager2);
+                context.CartDetails.Add(cartdetils1);
                 context.SaveChanges();
                 using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-                var logger = loggerFactory.CreateLogger<ProductsController>();
-                var controller = new ProductsController(context, logger);
+                var logger = loggerFactory.CreateLogger<CartsController>();
+                var controller = new CartsController(context, logger);
 
-                var actionResult = await controller.GetProductsByCategory();
+                var actionResult = await controller.GetCart("123");
 
-                var lstUsers = ((OkObjectResult)actionResult.Result).Value as IEnumerable<Category>;
+                var lstUsers = ((OkObjectResult)actionResult.Result).Value as IEnumerable<Cart>;
                 Xunit.Assert.IsAssignableFrom<OkObjectResult>(actionResult.Result);
-                Xunit.Assert.Equal(2, lstUsers.Count());
+                Xunit.Assert.Equal(1, lstUsers.FirstOrDefault().Cart_id);
+                Xunit.Assert.Single(lstUsers);
             }
         }
         [Fact]
-        public async Task GetProductsByCategoryID()
+        public async Task GetCartByID()
         {
             using (var context = applicationDbContext)
             {
@@ -165,243 +431,28 @@ namespace UnitTests
                 //context.Categories.Add(manager2);
                 context.SaveChanges();
                 // Given
-                var manager = new Product { Pr_id = 3, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc", CategoryForeignKey = 1 };
-                var manager2 = new Product { Pr_id = 4, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc", CategoryForeignKey = 1 };
-                context.Product.AddRange(manager, manager2);
+                var manager = new Cart { Cart_id = 1, UserID = "123", TotalQty = 2, TotalAmount = 100, Status = "PENDING" };
+                var manager2 = new Cart { Cart_id = 2, UserID = "1234", TotalQty = 2, TotalAmount = 100, Status = "CONFIRMED" };
+                var cartdetils1 = new CartDetails { CD_id = 1, CD_Pr_id = 1, ProductForeignKey = 1, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 1 };
+                var cartdetils2 = new CartDetails { CD_id =2, CD_Pr_id = 1, ProductForeignKey = 1, CD_Pr_Amnt = 100, CD_Pr_price = 100, CD_Pr_Qty = 1, CartForeignKey = 2 };
+                context.Cart.AddRange(manager, manager2);
+                context.CartDetails.AddRange(cartdetils1,cartdetils2);
                 context.SaveChanges();
                 using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-                var logger = loggerFactory.CreateLogger<ProductsController>();
-                var controller = new ProductsController(context, logger);
+                var logger = loggerFactory.CreateLogger<CartsController>();
+                var controller = new CartsController(context, logger);
 
-                var actionResult = await controller.GetProductsByCategoryID(1);
+                var actionResult = await controller.GetCartByID("1234", 2);
 
-                var lstUsers = ((OkObjectResult)actionResult.Result).Value as IEnumerable<Category>;
+                var lstUsers = ((OkObjectResult)actionResult.Result).Value as IEnumerable<Cart>;
                 
                 Xunit.Assert.IsAssignableFrom<OkObjectResult>(actionResult.Result);
-                Xunit.Assert.Equal(2, lstUsers.FirstOrDefault().Products.Count());
+                Xunit.Assert.Single(lstUsers);
+                Xunit.Assert.Equal(2, lstUsers.FirstOrDefault().Cart_id);
+
+                // Xunit.Assert.Equal(2, lstUsers.FirstOrDefault().Cart_id=2);
             }
         }
-        [Fact]
-        public async Task GetProductWithCat()
-        {
-            using (var context = applicationDbContext)
-            {
-                // Given
-                var cat1 = new Category { Cat_id = 1, Cat_name = "test@test.fr" };
-                var cat2 = new Category { Cat_id = 2, Cat_name = "test@test.fr" };
-                context.Categories.AddRange(cat1, cat2);
-                //context.Categories.Add(manager);
-                //context.Categories.Add(manager2);
-                context.SaveChanges();
-                // Given
-                var manager = new Product { Pr_id = 3, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc", CategoryForeignKey = 1 };
-                var manager2 = new Product { Pr_id = 4, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc", CategoryForeignKey = 2 };
-                context.Product.AddRange(manager, manager2);
-                context.SaveChanges();
-                using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-                var logger = loggerFactory.CreateLogger<ProductsController>();
-                var controller = new ProductsController(context, logger);
 
-                var actionResult = await controller.GetProductWithCat();
-
-                var lstUsers = ((OkObjectResult)actionResult.Result).Value as IEnumerable<Product>;
-                Xunit.Assert.IsAssignableFrom<OkObjectResult>(actionResult.Result);
-                Xunit.Assert.Equal(2, lstUsers.Count());
-            }
-        }
-        [Fact]
-        public async Task GetProductWithCatByID()
-        {
-            using (var context = applicationDbContext)
-            {
-                // Given
-                var cat1 = new Category { Cat_id = 1, Cat_name = "test@test.fr" };
-                var cat2 = new Category { Cat_id = 2, Cat_name = "test@test.fr" };
-                context.Categories.AddRange(cat1, cat2);
-                //context.Categories.Add(manager);
-                //context.Categories.Add(manager2);
-                context.SaveChanges();
-                // Given
-                var manager = new Product { Pr_id = 1, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc", CategoryForeignKey = 1 };
-                var manager2 = new Product { Pr_id = 4, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc", CategoryForeignKey = 1 };
-                context.Product.AddRange(manager, manager2);
-                context.SaveChanges();
-                using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-                var logger = loggerFactory.CreateLogger<ProductsController>();
-                var controller = new ProductsController(context, logger);
-
-                var actionResult = await controller.GetProductWithCatByID(1);
-
-                var lstUsers = ((OkObjectResult)actionResult.Result).Value as IEnumerable<Product>;
-
-                Xunit.Assert.IsAssignableFrom<OkObjectResult>(actionResult.Result);
-                Xunit.Assert.Equal(1, lstUsers.Count());
-            }
-        }
-        [Fact]
-         public async Task Get_Product_By_ID()
-         {
-             using (var context = applicationDbContext)
-             {
-                // Given
-                var manager = new Product { Pr_id = 3, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc" };
-                var manager2 = new Product { Pr_id = 4, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc" };
-                context.Product.AddRange(manager, manager2);
-                 context.SaveChanges();
-                 // ILogger<ProductsController> logger = new Logger<ProductsController>(new NullLoggerFactory());
-                 using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-                 var logger = loggerFactory.CreateLogger<ProductsController>();
-                 var controller = new ProductsController(context, logger);
-                 var actionResult = await controller.GetProduct(3);
-
-                 var lstUsers = ((OkObjectResult)actionResult.Result).Value as Product;
-                 Xunit.Assert.IsAssignableFrom<OkObjectResult>(actionResult.Result);
-                 Xunit.Assert.Equal(manager, lstUsers);
-             }
-
-
-         }
-         [Fact]
-         public async Task Get_Product_By_ID_Not_found()
-         {
-             //IOptions<OperationalStoreOptions> operationalStoreOptions = Options.Create(storeOptions);
-             //using (var context = new ApplicationDbContext(options,operationalStoreOptions))
-             using (var context = applicationDbContext)
-             {
-                 // ILogger<ProductsController> logger = new Logger<ProductsController>(new NullLoggerFactory());
-                 using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-                 var logger = loggerFactory.CreateLogger<ProductsController>();
-                 var controller = new ProductsController(context, logger);
-                 var actionResult = await controller.GetProduct(5);
-                 Xunit.Assert.IsAssignableFrom<NotFoundResult>(actionResult.Result);
-
-             }
-
-
-         }
-          [Fact]
-          public async Task Update_Product_By_ID_Bad_Request()
-          {
-              using (var context = applicationDbContext)
-              {
-
-                var manager = new Product { Pr_id = 3, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc" };
-                var manager2 = new Product { Pr_id = 4, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc" };
-                context.Product.AddRange(manager, manager2);
-                  context.SaveChanges();
-                  // ILogger<ProductsController> logger = new Logger<ProductsController>(new NullLoggerFactory());
-                  using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-                  var logger = loggerFactory.CreateLogger<ProductsController>();
-                  var controller = new ProductsController(context, logger);
-
-                  var actionResult = await controller.PutProduct(5,manager);
-                  Xunit.Assert.IsAssignableFrom<BadRequestResult>(actionResult);
-              }
-
-          }
-         [Fact]
-         public async Task Update_Product_By_ID_OK()
-         {
-             using (var context = applicationDbContext)
-             {
-                var manager = new Product { Pr_id = 3, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc" };
-                var manager2 = new Product { Pr_id = 4, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc" };
-                context.Product.AddRange(manager, manager2);
-                 context.SaveChanges();
-                 // ILogger<ProductsController> logger = new Logger<ProductsController>(new NullLoggerFactory());
-                 using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-                 var logger = loggerFactory.CreateLogger<ProductsController>();
-                 var controller = new ProductsController(context, logger);
-                 var actionResult = await controller.PutProduct(3, manager);
-                 Xunit.Assert.IsAssignableFrom<OkResult>(actionResult);
-             }
-
-
-         }
-         [Fact]
-          public async Task Delete_Product_Not_found()
-          {
-              using (var context = applicationDbContext)
-              {
-                  ILogger<ProductsController> logger = new Logger<ProductsController>(new NullLoggerFactory());
-                  var controller = new ProductsController(context, logger);
-                var actionResult = await controller.DeleteProduct(14);
-                Xunit.Assert.IsAssignableFrom<NotFoundResult>(actionResult.Result);
-                //output.WriteLine("This is output from {0}", actionResult.Result);
-              }
-          }
-          [Fact]
-         public async Task Delete_Product()
-         {
-             using (var context = applicationDbContext)
-             {
-                 ILogger<ProductsController> logger = new Logger<ProductsController>(new NullLoggerFactory());
-                 var controller = new ProductsController(context, logger);
-                 var manager = new Product { Pr_id = 3, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc" };
-                context.Product.Add(manager);
-                 context.SaveChanges();
-                var actionResult = await controller.DeleteProduct(3);
-                 var lstUsers = ((OkObjectResult)actionResult.Result).Value as Product;
-                Xunit.Assert.IsAssignableFrom<OkObjectResult>(actionResult.Result);
-                output.WriteLine("This is output from {0}", lstUsers.Pr_name);
-             }
-         }
-
-         [Fact]
-         public async Task  Check_Product_Exists()
-         {
-             using (var context = applicationDbContext)
-             {
-                var manager = new Product { Pr_id = 3, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc" };
-                var manager2 = new Product { Pr_id = 4, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc" };
-                context.Product.AddRange(manager);
-                 context.SaveChanges();
-
-                 // ILogger<ProductsController> logger = new Logger<ProductsController>(new NullLoggerFactory());
-                 using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-                 var logger = loggerFactory.CreateLogger<ProductsController>();
-                 var controller = new ProductsController(context, logger);
-                 var actionResult = await controller.PutProduct(4, manager2);
-                 Xunit.Assert.IsAssignableFrom<NotFoundResult>(actionResult);
-             }
-             }
-        [Fact]
-        public async Task Upload_Product_PIC()
-        {
-            using (var context = applicationDbContext)
-            {
-
-
-
-                ILogger<ProductsController> logger = new Logger<ProductsController>(new NullLoggerFactory());
-                var controller = new ProductsController(context, logger);
-              //  IFormFile file = new FormFile(new MemoryStream(Encoding.UTF8.GetBytes("This is a dummy file")), 0, 0, "Data", "dummy.txt");
-
-                var fileMock = new Mock<IFormFile>();
-                //Setup mock file using a memory stream
-                var content = "Hello World from a Fake File";
-                var fileName = "test.jpg";
-                var ms = new MemoryStream();
-                var writer = new StreamWriter(ms);
-                writer.Write(content);
-                writer.Flush();
-                ms.Position = 0;
-                fileMock.Setup(_ => _.OpenReadStream()).Returns(ms);
-                fileMock.Setup(_ => _.FileName).Returns(fileName);
-                fileMock.Setup(_ => _.Length).Returns(ms.Length);
-
-              ///  var sut = new MyController();
-                var file = fileMock.Object;
-             //   output.WriteLine("This is output from {0}", file.FileName+file.Name);
-                var actionResult = await controller.OnPostUploadAsync(file);
-                /*var manager = new Product { Pr_id = 3, Pr_name = "Test", Pr_price = 100, Pr_Picture = "", Pr_desc = "Test desc" };
-                context.Product.Add(manager);
-                context.SaveChanges();
-                var actionResult = await controller.DeleteProduct(3);
-                var lstUsers = ((OkObjectResult)actionResult.Result).Value as Product;*/
-                Xunit.Assert.IsAssignableFrom<OkObjectResult>(actionResult.Result);
-               // output.WriteLine("This is output from {0}", actionResult.Result);
-            }
-        }
     }
 }
