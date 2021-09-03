@@ -1,54 +1,55 @@
 import { Injectable } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { AuthorizeService } from './authorize.service';
-import { mergeMap } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, mergeMap, tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthorizeInterceptor implements HttpInterceptor {
-  constructor(private authorize: AuthorizeService) { }
+
+
+  constructor(private router: Router) {
+
+  }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    return this.authorize.getAccessToken()
-      .pipe(mergeMap(token => this.processRequestWithToken(token, req, next)));
-  }
-
-  // Checks if there is an access_token available in the authorize service
-  // and adds it to the request in case it's targeted at the same origin as the
-  // single page application.
-  private processRequestWithToken(token: string, req: HttpRequest<any>, next: HttpHandler) {
-    if (!!token && this.isSameOriginUrl(req)) {
-      req = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
+    if (localStorage.getItem('token') != null) {
+      const clonedReq = req.clone({
+        headers: req.headers.set('Authorization', 'Bearer ' + localStorage.getItem('token'))
       });
+      return next.handle(clonedReq).pipe(
+        tap(
+          succ => {
+
+          //  console.log("interceptor suc" + JSON.stringify(succ));
+          //  console.log("interceptor suc req" + JSON.stringify(clonedReq));
+
+
+          },
+          err => {
+          //  console.log("interceptor err" + JSON.stringify(err));
+            if (err.status == 401) {
+              localStorage.removeItem('token');
+            //  console.log("Not authorized");
+              this.router.navigateByUrl('/user/login');
+            }
+            else if (err.status == 403)
+              this.router.navigateByUrl('/forbidden');
+          }
+        )
+      )
     }
-
-    return next.handle(req);
-  }
-
-  private isSameOriginUrl(req: any) {
-    // It's an absolute url with the same origin.
-    if (req.url.startsWith(`${window.location.origin}/`)) {
-      return true;
+    else {
+     /* if (req.url != 'https://localhost:44316/api/UserProfile') {
+        this.router.navigateByUrl('/user/login');
+      }*/
+      
+    //  console.log("interceptor elase" + JSON.stringify(req));
+     // console.log("Not authorized");
+      return next.handle(req.clone());
     }
-
-    // It's a protocol relative url with the same origin.
-    // For example: //www.example.com/api/Products
-    if (req.url.startsWith(`//${window.location.host}/`)) {
-      return true;
-    }
-
-    // It's a relative url like /api/Products
-    if (/^\/[^\/].*/.test(req.url)) {
-      return true;
-    }
-
-    // It's an absolute or protocol relative url that
-    // doesn't have the same origin.
-    return false;
+     
   }
 }

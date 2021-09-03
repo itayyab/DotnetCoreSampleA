@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { AuthorizeService } from '../../api-authorization/authorize.service';
 import { SharedService } from '../_services/shared.service';
 import { ToastService } from '../_services/toast.service';
+import { UserService } from '../_services/user.service';
 import { Cart } from './cart';
 import { CartDetails } from './cart-details';
 import { CartService } from './cart.service';
@@ -17,15 +18,16 @@ export class CartComponent implements OnInit {
   // public userSub: Observable<string>;
   heroes: Cart[];
   userid: string;
-  baseUrl= "";
-  constructor(private heroesService: CartService, @Inject('BASE_URL') baseUrl: string, private authorizeService: AuthorizeService, public toastService: ToastService, private route: ActivatedRoute,
+  baseUrl = "";
+  constructor(private heroesService: CartService, @Inject('BASE_URL') baseUrl: string, private authorizeService: UserService, public toastService: ToastService, private route: ActivatedRoute,
     private router: Router, private sharedService: SharedService) {
     this.baseUrl = baseUrl;
     //console.log("BaeURL:" + baseUrl);
   }
   ngOnInit() {
     
-    this.authorizeService.getUserSub().subscribe(heroes => {
+    this.authorizeService.getHeroesXX().subscribe(heroesX => {
+      var heroes = heroesX.body.userId;
      // console.log("userSub:" + heroes);
       this.userid = heroes;
       this.getHeroes(heroes);
@@ -43,7 +45,8 @@ export class CartComponent implements OnInit {
       });
   }
   delfromCart(productid: number,product:string): void {
-    this.authorizeService.getUserSub().subscribe(heroes => {
+    this.authorizeService.getHeroesXX().subscribe(heroesX => {
+      var heroes = heroesX.body.userId;
     //  console.log("userSub:" + heroes);
 
       var carx: CartDetails[] = [{ cD_Pr_id: productid, cD_id: 0, cartForeignKey: 0, cD_Pr_Amnt: 0, cD_Pr_price: 0, cD_Pr_Qty: 0, cart: null, product: null, productForeignKey: 0 }];
@@ -55,7 +58,7 @@ export class CartComponent implements OnInit {
         .subscribe(hero => {
        //   console.log(JSON.stringify(hero));
           this.showError(product);
-          this.sharedService.toggleChange();
+          this.sharedService.togglecartChange();
        //   console.log('size' + this.heroes.length);
         //  var cx;
         /*  this.heroes.filter(obj => obj.cartDetails !== undefined)
@@ -76,7 +79,8 @@ export class CartComponent implements OnInit {
     });
   }
   checkoutCart(): void {
-    this.authorizeService.getUserSub().subscribe(heroes => {
+    this.authorizeService.getHeroesXX().subscribe(heroesX => {
+      var heroes = heroesX.body.userId;
       //console.log("userSub:" + heroes);
       var carx: CartDetails[] = [{ cD_Pr_id: 0, cD_id: 0, cartForeignKey: 0, cD_Pr_Amnt: 0, cD_Pr_price: 0, cD_Pr_Qty: 0, cart: null, product: null, productForeignKey: 0 }];
       var cart = {
@@ -88,7 +92,7 @@ export class CartComponent implements OnInit {
          // console.log(JSON.stringify(hero));
           //  this.getHeroes(this.userid);
           this.showSuccess();
-          this.sharedService.toggleChange();
+          this.sharedService.togglecartChange();
           this.router.navigate(['/checkout', { id: hero.cart_id }]);
         });
     });
@@ -96,7 +100,7 @@ export class CartComponent implements OnInit {
   showSuccess() {
     this.toastService.show("Completed successfully!", {
       classname: 'bg-success text-light',
-      delay: 5000,
+      delay: 2000,
       autohide: true,
       headertext: 'Checkout'
     });

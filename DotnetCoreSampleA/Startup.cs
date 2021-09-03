@@ -1,6 +1,7 @@
 using DotnetCoreSampleA.Data;
 using DotnetCoreSampleA.Models;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -13,11 +14,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog.Fluent;
 using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 
 namespace DotnetCoreSampleA
 {
@@ -33,43 +36,61 @@ namespace DotnetCoreSampleA
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true).AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
-            
-            //X509Certificate2 cert = null;
-            //using (X509Store certStore = new X509Store(StoreName.My, StoreLocation.CurrentUser))
-            //{
-            //    certStore.Open(OpenFlags.ReadOnly);
-            //    X509Certificate2Collection certCollection = certStore.Certificates.Find(
-            //        X509FindType.FindByThumbprint,
-            //        // Replace below with your cert's thumbprint
-            //        "8f9cfcf9f6d9370723670efdb8e0da68b6e0c6d6",
-            //        false);
-            //    // Get the first cert with the thumbprint
-            //    if (certCollection.Count > 0)
-            //    {
-            //        cert = certCollection[0];
-            //        Log.Info($"Successfully loaded cert from registry: {cert.Thumbprint}");
-            //        //Log.Logger.Information($);
-            //    }
-            //}
-
-            //// Fallback to local file for development
-            //if (cert == null)
-            //{
-            //    cert = new X509Certificate2(Path.Combine("C:\\Users\\Tayyab\\dotnetcore\\dotnetsamplea.pfx"), "123");
-            //    Log.Info($"Falling back to cert from file. Successfully loaded: {cert.Thumbprint}");
-            //    //Log.Logger.Information($"Falling back to cert from file. Successfully loaded: {cert.Thumbprint}");
-            //}
-            services.AddIdentityServer()
+           /* services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true).AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>();*/
+           
+          /*  services.AddIdentityServer()
                 .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();//.AddSigningCredential(cert);
 
             services.AddAuthentication()
-                .AddIdentityServerJwt();
+                .AddIdentityServerJwt();*/
+
+
+            services.AddDefaultIdentity<ApplicationUser>()
+              .AddRoles<IdentityRole>()
+              .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 4;
+            }
+            );
+
+            services.AddCors();
+
+            //Jwt Authentication
+
+            var key = Encoding.UTF8.GetBytes(Configuration["ApplicationSettings:JWT_Secret"].ToString());
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x => {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = false;
+                x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+
+
+
             services.AddControllersWithViews();
             services.AddRazorPages();
             // In production, the Angular files will be served from this directory
@@ -125,7 +146,7 @@ namespace DotnetCoreSampleA
             app.UseRouting();
 
             app.UseAuthentication();
-            app.UseIdentityServer();
+            //app.UseIdentityServer();
             app.UseAuthorization();
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();

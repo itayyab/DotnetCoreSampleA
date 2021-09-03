@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DotnetCoreSampleA.Data;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DotnetCoreSampleA
 {
@@ -60,6 +61,7 @@ namespace DotnetCoreSampleA
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> PutCategories(long id, Category categories)
         {
             if (id != categories.Cat_id)
@@ -92,6 +94,7 @@ namespace DotnetCoreSampleA
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
+        [Authorize(Roles = "ADMIN")]
         public async Task<ActionResult<Category>> PostCategories(Category categories)
         {
             _context.Categories.Add(categories);
@@ -102,6 +105,7 @@ namespace DotnetCoreSampleA
 
         // DELETE: api/Categories/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<ActionResult<Category>> DeleteCategories(long id)
         {
             var categories = await _context.Categories.FindAsync(id);

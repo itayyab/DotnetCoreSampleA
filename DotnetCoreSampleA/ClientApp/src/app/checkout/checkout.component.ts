@@ -5,6 +5,7 @@ import { AuthorizeService } from '../../api-authorization/authorize.service';
 import { Cart } from '../cart/cart';
 import { CartService } from '../cart/cart.service';
 import { ToastService } from '../_services/toast.service';
+import { UserService } from '../_services/user.service';
 
 @Component({
   selector: 'app-checkout',
@@ -16,7 +17,7 @@ export class CheckoutComponent implements OnInit {
   heroes: Cart[];
   userid: string;
   baseUrl = "";
-  constructor(private heroesService: CartService, @Inject('BASE_URL') baseUrl: string, private authorizeService: AuthorizeService, public toastService: ToastService, private route: ActivatedRoute,
+  constructor(private heroesService: CartService, @Inject('BASE_URL') baseUrl: string, private authorizeService: UserService, public toastService: ToastService, private route: ActivatedRoute,
     private router: Router) {
     this.baseUrl = baseUrl;
    // console.log("BaeURL:" + baseUrl);
@@ -33,7 +34,8 @@ export class CheckoutComponent implements OnInit {
        // return this.service.getHeroes();
       })
     );*/
-    this.authorizeService.getUserSub().subscribe(heroes => {
+    this.authorizeService.getHeroesXX().subscribe(heroesX => {
+      var heroes = heroesX.body.userId;
      // console.log("userSub:" + heroes);
       this.userid = heroes;
       this.getHeroes(heroes, heroId);

@@ -10,6 +10,7 @@ using DotnetCoreSampleA.Models;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DotnetCoreSampleA.Controllers
 {
@@ -87,6 +88,7 @@ namespace DotnetCoreSampleA.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> PutProduct(long id, Product product)
         {
             if (id != product.Pr_id)
@@ -119,6 +121,7 @@ namespace DotnetCoreSampleA.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
+        [Authorize(Roles = "ADMIN")]
         public async Task<ActionResult<Product>> PostProduct(Product product)
         {
             _context.Product.Add(product);
@@ -129,6 +132,7 @@ namespace DotnetCoreSampleA.Controllers
 
         // DELETE: api/Products/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<ActionResult<Product>> DeleteProduct(long id)
         {
             var product = await _context.Product.FindAsync(id);
@@ -147,6 +151,7 @@ namespace DotnetCoreSampleA.Controllers
             return _context.Product.Any(e => e.Pr_id == id);
         }
         [HttpPost("UploadFile")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<ActionResult<String>> OnPostUploadAsync(IFormFile file)
         {
 

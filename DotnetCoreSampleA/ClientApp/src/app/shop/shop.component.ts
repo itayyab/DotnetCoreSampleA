@@ -8,6 +8,7 @@ import { ShopService } from './shop.service';
 import $ from 'jquery';
 import { ToastService } from '../_services/toast.service';
 import { SharedService } from '../_services/shared.service';
+import { UserService } from '../_services/user.service';
 
 @Component({
   selector: 'app-shop',
@@ -18,7 +19,7 @@ export class ShopComponent implements OnInit {
 
   products: Product[];
   baseUrl = "";
-  constructor(private heroesService: ShopService, private cartService: CartService, @Inject('BASE_URL') baseUrl: string, private authorizeService: AuthorizeService, public toastService: ToastService, private sharedService: SharedService) {
+  constructor(private heroesService: ShopService, private cartService: CartService, @Inject('BASE_URL') baseUrl: string, private authorizeService: UserService, public toastService: ToastService, private sharedService: SharedService) {
     this.baseUrl = baseUrl;
   //  console.log("BaeURL:" + baseUrl);
   }
@@ -37,7 +38,8 @@ export class ShopComponent implements OnInit {
       });
   }
   addtoCart(productid: number, name: string): void {
-    this.authorizeService.getUserSub().subscribe(heroes => {
+    this.authorizeService.getHeroesXX().subscribe(heroesX => {
+      var heroes = heroesX.body.userId;
       //console.log("userSub:" + heroes);
       var carx: CartDetails[] = [{ cD_Pr_id: productid, cD_id:0, cartForeignKey: 0, cD_Pr_Amnt: 0, cD_Pr_price: 0, cD_Pr_Qty: 0, cart: null, product: null, productForeignKey:0 }];
       var cart = {
@@ -47,14 +49,14 @@ export class ShopComponent implements OnInit {
       this.cartService.addHeroX(cart)
         .subscribe(hero => {
           this.showSuccess(name);
-          this.sharedService.toggleChange();
+          this.sharedService.togglecartChange();
       });
     });
   }
   showSuccess(product) {
     this.toastService.show(product, {
       classname: 'bg-success text-light',
-      delay: 5000,
+      delay: 2000,
       autohide: true,
       headertext: 'Product added to cart'
     });
