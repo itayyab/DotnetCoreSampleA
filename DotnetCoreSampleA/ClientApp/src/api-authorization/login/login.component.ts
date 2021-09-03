@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthorizeService, AuthenticationResultStatus } from '../authorize.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { LoginActions, QueryParameterNames, ApplicationPaths, ReturnUrlType } from '../api-authorization.constants';
@@ -17,13 +16,12 @@ export class LoginComponent implements OnInit {
   public message = new BehaviorSubject<string>(null);
 
   constructor(
-    private authorizeService: AuthorizeService,
     private activatedRoute: ActivatedRoute,
     private router: Router) { }
 
   async ngOnInit() {
     const action = this.activatedRoute.snapshot.url[1];
-    switch (action.path) {
+    /*switch (action.path) {
       case LoginActions.Login:
         await this.login(this.getReturnUrl());
         break;
@@ -42,11 +40,11 @@ export class LoginComponent implements OnInit {
         break;
       default:
         throw new Error(`Invalid action '${action}'`);
-    }
+    }*/
   }
 
 
-  private async login(returnUrl: string): Promise<void> {
+ /* private async login(returnUrl: string): Promise<void> {
     const state: INavigationState = { returnUrl };
     const result = await this.authorizeService.signIn(state);
     this.message.next(undefined);
@@ -98,6 +96,7 @@ export class LoginComponent implements OnInit {
       replaceUrl: true
     });
   }
+  */
 
   private getReturnUrl(state?: INavigationState): string {
     const fromQuery = (this.activatedRoute.snapshot.queryParams as INavigationState).returnUrl;

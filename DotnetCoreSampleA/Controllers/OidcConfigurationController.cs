@@ -6,7 +6,7 @@ namespace DotnetCoreSampleA.Controllers
 {
     public class OidcConfigurationController : Controller
     {
-        private readonly ILogger<OidcConfigurationController> logger;
+       /* private readonly ILogger<OidcConfigurationController> logger;
 
         public OidcConfigurationController(IClientRequestParametersProvider clientRequestParametersProvider, ILogger<OidcConfigurationController> _logger)
         {
@@ -21,6 +21,6 @@ namespace DotnetCoreSampleA.Controllers
         {
             var parameters = ClientRequestParametersProvider.GetClientParameters(HttpContext, clientId);
             return Ok(parameters);
-        }
+        }*/
     }
 }

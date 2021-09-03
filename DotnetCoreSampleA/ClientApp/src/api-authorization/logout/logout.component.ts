@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthenticationResultStatus, AuthorizeService } from '../authorize.service';
 import { BehaviorSubject } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs/operators';
@@ -17,13 +16,12 @@ export class LogoutComponent implements OnInit {
   public message = new BehaviorSubject<string>(null);
 
   constructor(
-    private authorizeService: AuthorizeService,
     private activatedRoute: ActivatedRoute,
     private router: Router) { }
 
   async ngOnInit() {
     const action = this.activatedRoute.snapshot.url[1];
-    switch (action.path) {
+   /* switch (action.path) {
       case LogoutActions.Logout:
         if (!!window.history.state.local) {
           await this.logout(this.getReturnUrl());
@@ -42,9 +40,10 @@ export class LogoutComponent implements OnInit {
       default:
         throw new Error(`Invalid action '${action}'`);
     }
+    */
   }
 
-  private async logout(returnUrl: string): Promise<void> {
+ /* private async logout(returnUrl: string): Promise<void> {
     const state: INavigationState = { returnUrl };
     const isauthenticated = await this.authorizeService.isAuthenticated().pipe(
       take(1)
@@ -92,6 +91,7 @@ export class LogoutComponent implements OnInit {
       replaceUrl: true
     });
   }
+  */
 
   private getReturnUrl(state?: INavigationState): string {
     const fromQuery = (this.activatedRoute.snapshot.queryParams as INavigationState).returnUrl;
