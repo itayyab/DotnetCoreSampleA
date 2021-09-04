@@ -40,7 +40,7 @@ export class LoginComponent implements OnInit {
     this.service.login(form).subscribe(
       (res: any) => {
         localStorage.setItem('token', res.token);
-       // this.showSuccess('Logged in.');
+        this.showSuccess('Logged in.');
         if (this.path != "") {
         //  console.log("redirectingto:" + this.path)
           this.router.navigateByUrl(this.path);

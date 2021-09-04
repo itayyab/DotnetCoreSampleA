@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { ToastService } from '../../_services/toast.service';
 import { UserService } from '../../_services/user.service';
 
@@ -10,10 +11,13 @@ import { UserService } from '../../_services/user.service';
 })
 export class RegistrationComponent implements OnInit {
 
-  constructor(public service: UserService,public toastService: ToastService) { }
+  constructor(public service: UserService, public toastService: ToastService, private router: Router) { }
 
   ngOnInit() {
     this.service.formModel.reset();
+    if (localStorage.getItem('token') != null) {
+      this.router.navigateByUrl("/");
+    }
   }
 
   onSubmit() {
