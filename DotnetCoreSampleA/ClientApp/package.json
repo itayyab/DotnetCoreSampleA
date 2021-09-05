@@ -7,6 +7,7 @@
     "build": "ng build",
     "build:ssr": "ng run DotnetCoreSampleA:server:dev",
     "test": "ng test",
+    "covg": "ng test --no-watch --code-coverage",
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
