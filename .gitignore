@@ -364,3 +364,5 @@ FodyWeavers.xsd
 
 */StaticFiles/Images/*
 !*/StaticFiles/Images/no_image.png
+.sonarqube/
+sonar.cmd

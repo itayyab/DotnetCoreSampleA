@@ -25,5 +25,21 @@ namespace UnitTests
             var req = pageModel.ShowRequestId;
             Assert.True(req);
         }
+       /* [Fact]
+        public void ErrorTestOnGet()
+        {
+            var serviceProvider = new ServiceCollection().AddLogging().BuildServiceProvider();
+
+            var factory = serviceProvider.GetService<ILoggerFactory>();
+
+            var logger = factory.CreateLogger<ErrorModel>();
+            //arrange
+            var pageModel = new ErrorModel(logger);
+            pageModel.RequestId = "123";
+
+            var req = pageModel.ShowRequestId;
+            pageModel.OnGet();
+            Assert.True(req);
+        }*/
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetCoreSampleA.Controllers
 {
@@ -15,8 +16,10 @@ namespace DotnetCoreSampleA.Controllers
     public class UserProfileController : ControllerBase
     {
         private UserManager<ApplicationUser> _userManager;
-        public UserProfileController(UserManager<ApplicationUser> userManager)
+        private readonly ILogger _logger;
+        public UserProfileController(UserManager<ApplicationUser> userManager,ILogger<UserProfileController> logger)
         {
+            _logger = logger;
             _userManager = userManager;
         }
 
