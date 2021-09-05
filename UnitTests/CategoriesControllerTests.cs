@@ -692,6 +692,7 @@ namespace UnitTests
                 // 
 
                 var actionResult = await controller.DeleteCategories(1);
+                Xunit.Assert.IsAssignableFrom<NotFoundResult>(actionResult.Result);
                 // var actionResult = await controller.PostCategories(cat);
 
                 // var result = controller.PostCategories(cat).Result;
@@ -701,7 +702,7 @@ namespace UnitTests
                 //Assert
                 //Return proper HTTPStatus code\
 
-               // var item = (Categories)((ActionResult)actionResult.Result);
+                // var item = (Categories)((ActionResult)actionResult.Result);
                 //   Xunit.Assert.Equal(cat, (actionResult.Result as CreatedAtActionResult).Value); // SHOULD WORK!!
                 output.WriteLine("This is output from {0}", actionResult.Result);
               //  Xunit.Assert.IsType<Categories>(item);
@@ -761,6 +762,7 @@ namespace UnitTests
                 // var item = (Categories)((ActionResult)actionResult.Result);
                 //   Xunit.Assert.Equal(cat, (actionResult.Result as CreatedAtActionResult).Value); // SHOULD WORK!!
                 output.WriteLine("This is output from {0}", lstUsers.Cat_name);
+                Xunit.Assert.IsAssignableFrom<OkObjectResult>(actionResult.Result);
                 //  Xunit.Assert.IsType<Categories>(item);
 
                 //Xunit.Assert.Equal(cat.Cat_id, item.Cat_id);

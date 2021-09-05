@@ -235,7 +235,7 @@ namespace UnitTests
                 var lstUsers = ((OkObjectResult)actionResult.Result).Value as IEnumerable<Product>;
 
                 Xunit.Assert.IsAssignableFrom<OkObjectResult>(actionResult.Result);
-                Xunit.Assert.Equal(1, lstUsers.Count());
+                Xunit.Assert.Single(lstUsers);
             }
         }
         [Fact]
