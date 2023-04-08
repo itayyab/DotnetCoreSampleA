@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using Xunit.Abstractions;
 using System.Threading.Tasks;
-using IdentityServer4.EntityFramework.Options;
+using Duende.IdentityServer.EntityFramework.Options;
 using Microsoft.Extensions.Options;
 using System.Linq;
 using Microsoft.Extensions.Logging;

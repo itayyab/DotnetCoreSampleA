@@ -1,5 +1,5 @@
 ﻿using DotnetCoreSampleA.Models;
-using IdentityServer4.EntityFramework.Options;
+
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -10,6 +10,7 @@ using DotnetCoreSampleA;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Globalization;
 using Microsoft.CodeAnalysis;
+using Duende.IdentityServer.EntityFramework.Options;
 
 namespace DotnetCoreSampleA.Data
 {
