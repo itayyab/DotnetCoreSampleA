@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dot-net-core-store-app
+spec:
+  selector:
+    matchLabels:
+      app: dot-net-core-store-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dot-net-core-store-app
+    spec:
+      containers:
+      - name: dot-net-core-store-app
+        image: tayyab0o1/dot-net-core-store-app:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: ConnectionStrings__DefaultConnection
+          value: {{DBCONNECTION}}
+        volumeMounts:
+        - name: node-modules
+          mountPath: /app/ClientApp/node_modules
+      volumes:
+      - name: node-modules
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dot-net-core-store-app-service
+spec:
+  selector:
+    app: dot-net-core-store-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer
+---
