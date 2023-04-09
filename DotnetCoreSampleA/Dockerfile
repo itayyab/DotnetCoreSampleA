@@ -36,8 +36,9 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 COPY --from=publish /app/publish .
-COPY --from=client /app/dist /app/dist
-RUN mkdir StaticFiles
+COPY --from=client /app/dist /app/ClientApp/dist
+COPY /StaticFiles/Images/no_image.png /app/StaticFiles/Images/no_image.png
+
 ENV ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_URLS="http://0.0.0.0:80"
 ENV ConnectionStrings__DefaultConnection="Server=(local);Database=DotnetCoreSampleA_DB;Trusted_Connection=True;MultipleActiveResultSets=true;User ID=sa;Password=1325897"
