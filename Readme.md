@@ -21,8 +21,8 @@ docker run -ti -p 8080:80 -e ConnectionStrings__DefaultConnection="<your connect
 The application can be access using localhost:8080.
 
 ## Azure SQL Database:
-To provision SQL database on Azure use the [azsqlserver.ps1](scripts\azsqlserver.ps1) script. The scripts asks for IP that can be whitelisted in the firewall. It also asks for the password to be used for SQL Server.
-To deploy the Application on Azure k8s cluster use [azk8s.ps1](scripts\azk8s.ps1) script. The script will require you to provide the connection string for your database connection.
-To clean up the Azure resources use: [destroy.ps1](scripts\destroy.ps1).
+To provision SQL database on Azure use the [azsqlserver.ps1](scripts/azsqlserver.ps1) script. The scripts asks for IP that can be whitelisted in the firewall. It also asks for the password to be used for SQL Server.
+To deploy the Application on Azure k8s cluster use [azk8s.ps1](scripts/azk8s.ps1) script. The script will require you to provide the connection string for your database connection.
+To clean up the Azure resources use: [destroy.ps1](scripts/destroy.ps1).
 
 	
