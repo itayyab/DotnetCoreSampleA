@@ -16,7 +16,7 @@ docker push dot-net-core-store-app:latest
 ```
 To run the application using docker use: 
 ```
-docker run -ti -p 8080:80 -e ConnectionStrings__DefaultConnection="<your connection string>" dot-net-core-store-app
+docker run -ti -p 8080:80 -e ConnectionStrings__DefaultConnection="Server=tcp:127.0.0.1,1433;Database=DotnetCoreSampleA_DB;User ID=xxxxxx;Password=xxxxxxx;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30;"  dot-net-core-store-app
 ```
 The application can be access using localhost:8080.
 
