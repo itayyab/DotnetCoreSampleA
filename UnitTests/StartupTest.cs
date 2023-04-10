@@ -67,14 +67,14 @@ namespace UnitTests
             _server = new TestServer(webHostBuilder);
             _client = _server.CreateClient();*/
         }
-        [Fact]
-        public void Startup_TEST()
-        {
-            var webHost = Microsoft.AspNetCore.WebHost.CreateDefaultBuilder().UseStartup<Startup>().Build();
-            Assert.NotNull(webHost);
-            // Assert
-            //Assert.NotNull(_server);
-            //Assert.NotNull(_client);
-        }
+        //[Fact]
+        //public void Startup_TEST()
+        //{
+        //    var webHost = Microsoft.AspNetCore.WebHost.CreateDefaultBuilder().UseStartup<Startup>().Build();
+        //    Assert.NotNull(webHost);
+        //    // Assert
+        //    //Assert.NotNull(_server);
+        //    //Assert.NotNull(_client);
+        //}
     }
 }

@@ -30,6 +30,10 @@ namespace DotnetCoreSampleA.Controllers
         {
             string userId = User.Claims.First(c => c.Type == "UserID").Value;
             var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
             return new
             {
                 userId,
